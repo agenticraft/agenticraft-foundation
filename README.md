@@ -76,7 +76,7 @@ t = list(traces(lts, max_length=5))
 print(f"Traces: {len(t)}")
 ```
 
-See the [RAG pipeline verification](examples/rag_pipeline_verification.py) for an end-to-end example combining CSP, deadlock detection, topology analysis, and temporal logic across 4 agents. More examples in the [docs](https://agenticraft.github.io/agenticraft-foundation/examples/).
+See the [RAG pipeline verification](examples/rag_pipeline_verification.py) for an end-to-end example combining CSP, deadlock detection, topology analysis, and temporal logic across 4 agents. More examples in the [docs](https://agenticraft.ai/foundation/examples/).
 
 ## Architecture
 
@@ -190,7 +190,7 @@ All 13 CSP operators implement the full `Process` contract: `kind`, `alphabet()`
 | `Rename` | `P[[a<-b]]` | Event vocabulary mapping | Protocol bridging between agents |
 | `Pipe` | `P \|> Q` | Producer-consumer pipeline | RAG pipeline, multi-stage processing |
 
-See the [full operator reference](https://agenticraft.github.io/agenticraft-foundation/concepts/process-algebra/) for recursion, verification pipeline, and detailed semantics.
+See the [full operator reference](https://agenticraft.ai/foundation/concepts/process-algebra/) for recursion, verification pipeline, and detailed semantics.
 
 ## Modules
 
@@ -205,7 +205,7 @@ See the [full operator reference](https://agenticraft.github.io/agenticraft-foun
 | `verification` | Runtime invariant checking, structured counterexample generation, CTL temporal logic model checking, probabilistic verification (DTMC reachability, steady-state, expected steps) | 199 |
 | `integration` | MPST bridge adapter (MCP/A2A session types), CSP orchestration adapter (DAG-to-CSP, workflow verification) | 52 |
 
-See the docs for: [Protocol Graph Model](https://agenticraft.github.io/agenticraft-foundation/concepts/protocol-graph/) | [Verification Pipeline](https://agenticraft.github.io/agenticraft-foundation/concepts/verification/) | [Spectral Topology](https://agenticraft.github.io/agenticraft-foundation/concepts/spectral-topology/) | [Fault Models & Complexity](https://agenticraft.github.io/agenticraft-foundation/concepts/complexity/) | [Consensus & MAS Mappings](https://agenticraft.github.io/agenticraft-foundation/concepts/consensus/) | [Full API Reference](https://agenticraft.github.io/agenticraft-foundation/api/)
+See the docs for: [Protocol Graph Model](https://agenticraft.ai/foundation/concepts/protocol-graph/) | [Verification Pipeline](https://agenticraft.ai/foundation/concepts/verification/) | [Spectral Topology](https://agenticraft.ai/foundation/concepts/spectral-topology/) | [Fault Models & Complexity](https://agenticraft.ai/foundation/concepts/complexity/) | [Consensus & MAS Mappings](https://agenticraft.ai/foundation/concepts/consensus/) | [Full API Reference](https://agenticraft.ai/foundation/api/)
 
 ## Development
 
@@ -252,7 +252,7 @@ Multi-agent systems fail in production because coordination bugs are invisible u
 - Baier, C., Katoen, J.-P. (2008). *Principles of Model Checking*. MIT Press.
 - Honda, K., Yoshida, N., Carbone, M. (2016). Multiparty Asynchronous Session Types. *JACM*.
 
-See the [full references](https://agenticraft.github.io/agenticraft-foundation/changelog/) in the documentation.
+See the [full references](https://agenticraft.ai/foundation/changelog/) in the documentation.
 
 ## Citation
 
