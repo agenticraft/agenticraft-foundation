@@ -145,9 +145,7 @@ class DTMC:
         if target not in self.states:
             raise ValueError(f"Target state {target} does not exist")
 
-        trans = ProbabilisticTransition(
-            source=source, target=target, probability=probability
-        )
+        trans = ProbabilisticTransition(source=source, target=target, probability=probability)
         self.transitions.append(trans)
         return trans
 
@@ -255,8 +253,7 @@ class DTMC:
             prob_sum = sum(t.probability for t in transitions)
             if abs(prob_sum - 1.0) > _PROBABILITY_SUM_TOLERANCE:
                 raise ValueError(
-                    f"State {state_id}: outgoing probabilities sum to "
-                    f"{prob_sum:.6f}, expected 1.0"
+                    f"State {state_id}: outgoing probabilities sum to {prob_sum:.6f}, expected 1.0"
                 )
 
             for t in transitions:
@@ -426,9 +423,7 @@ def _value_iteration(
     for _ in range(max_iterations):
         max_diff = 0.0
         for s in unknown_states:
-            new_val = sum(
-                p * prob.get(t, 0.0) for t, p in dtmc.successors(s)
-            )
+            new_val = sum(p * prob.get(t, 0.0) for t, p in dtmc.successors(s))
             diff = abs(new_val - prob[s])
             if diff > max_diff:
                 max_diff = diff

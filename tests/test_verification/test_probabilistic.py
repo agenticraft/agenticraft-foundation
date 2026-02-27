@@ -24,8 +24,8 @@ from agenticraft_foundation.verification.probabilistic import (
 
 def _make_simple_dtmc() -> DTMC:
     """Simple DTMC:
-        0 --1.0--> 1 --0.9--> 2 (success, absorbing)
-                    1 --0.1--> 3 (error, absorbing)
+    0 --1.0--> 1 --0.9--> 2 (success, absorbing)
+                1 --0.1--> 3 (error, absorbing)
     """
     dtmc = DTMC()
     dtmc.add_state(0, labels={"init"})
@@ -42,8 +42,8 @@ def _make_simple_dtmc() -> DTMC:
 
 def _make_retry_dtmc() -> DTMC:
     """Retry DTMC: process can fail and retry.
-        0 --1.0--> 1 --0.7--> 2 (success, absorbing)
-                    1 --0.3--> 0 (retry)
+    0 --1.0--> 1 --0.7--> 2 (success, absorbing)
+                1 --0.3--> 0 (retry)
     """
     dtmc = DTMC()
     dtmc.add_state(0, labels={"init"})
@@ -58,10 +58,10 @@ def _make_retry_dtmc() -> DTMC:
 
 def _make_ergodic_dtmc() -> DTMC:
     """Ergodic (strongly connected) DTMC:
-        0 --0.6--> 1
-        0 --0.4--> 0
-        1 --0.5--> 0
-        1 --0.5--> 1
+    0 --0.6--> 1
+    0 --0.4--> 0
+    1 --0.5--> 0
+    1 --0.5--> 1
     """
     dtmc = DTMC()
     dtmc.add_state(0, labels={"a"})
@@ -75,8 +75,8 @@ def _make_ergodic_dtmc() -> DTMC:
 
 def _make_three_state_absorbing() -> DTMC:
     """Three-state absorbing chain:
-        0 --0.5--> 1 --0.8--> 2 (absorbing)
-        0 --0.5--> 0            1 --0.2--> 0
+    0 --0.5--> 1 --0.8--> 2 (absorbing)
+    0 --0.5--> 0            1 --0.2--> 0
     """
     dtmc = DTMC()
     dtmc.add_state(0, labels={"start"})
@@ -280,9 +280,7 @@ class TestCheckReachability:
 
     def test_with_both_labels_and_states(self) -> None:
         dtmc = _make_simple_dtmc()
-        result = check_reachability(
-            dtmc, target_labels={"error"}, target_states={2}
-        )
+        result = check_reachability(dtmc, target_labels={"error"}, target_states={2})
         # Union: targets = {2, 3}
         assert abs(result.probability - 1.0) < 1e-6
 

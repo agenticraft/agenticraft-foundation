@@ -159,9 +159,7 @@ class Implies(CTLFormula):
         return f"({self.left} → {self.right})"
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, Implies) and self.left == other.left and self.right == other.right
-        )
+        return isinstance(other, Implies) and self.left == other.left and self.right == other.right
 
     def __hash__(self) -> int:
         return hash(("Implies", self.left, self.right))
@@ -570,9 +568,7 @@ def _gfp_eg(lts: LTS, sat_phi: set[int]) -> set[int]:
         to_remove: set[int] = set()
         for state_id in current:
             # Check if there's at least one successor still in current
-            has_successor_in_set = any(
-                target in current for _, target in lts.successors(state_id)
-            )
+            has_successor_in_set = any(target in current for _, target in lts.successors(state_id))
             if not has_successor_in_set:
                 to_remove.add(state_id)
 
@@ -725,9 +721,7 @@ def model_check(
 
     counterexample: Trace | None = None
     if not satisfied:
-        counterexample = _find_counterexample_trace(
-            lts, sat_set, max_counterexample_length
-        )
+        counterexample = _find_counterexample_trace(lts, sat_set, max_counterexample_length)
 
     return ModelCheckResult(
         satisfied=satisfied,

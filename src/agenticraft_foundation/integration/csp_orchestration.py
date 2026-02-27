@@ -487,9 +487,7 @@ class CSPOrchestrationAdapter:
         if not ref_result.is_valid:
             # Narrow counterexample to tuple[Event, ...] | None (exclude Failure)
             counterexample = (
-                ref_result.counterexample
-                if isinstance(ref_result.counterexample, tuple)
-                else None
+                ref_result.counterexample if isinstance(ref_result.counterexample, tuple) else None
             )
             return WorkflowVerificationResult.failed(
                 violations=[f"Implementation does not refine specification ({mode})"],

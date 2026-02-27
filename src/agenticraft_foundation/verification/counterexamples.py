@@ -358,9 +358,7 @@ def _explain_failure_refinement(
     refused = failure.refusals
 
     if trace_divergence >= 0:
-        summary = (
-            f"Impl trace {_trace_str(trace)} diverges from spec at step {trace_divergence}"
-        )
+        summary = f"Impl trace {_trace_str(trace)} diverges from spec at step {trace_divergence}"
         divergence_point = trace_divergence
         spec_allowed = spec_walk[trace_divergence][1]
         impl_attempted = trace[trace_divergence]
