@@ -29,7 +29,6 @@ from agenticraft_foundation.verification.temporal import (
     model_check,
 )
 
-
 # =============================================================================
 # Test Fixtures: LTS Construction Helpers
 # =============================================================================
@@ -692,8 +691,7 @@ class TestProcessInput:
     def test_with_process(self) -> None:
         # Build a simple process: a -> b -> STOP
         p = Prefix(Event("a"), Prefix(Event("b"), Stop()))
-        lts = LTS()
-        # We need to build the LTS first to know state IDs
+        # Build the LTS to know state IDs
         from agenticraft_foundation.algebra.semantics import build_lts
 
         built = build_lts(p)

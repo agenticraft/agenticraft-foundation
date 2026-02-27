@@ -15,7 +15,7 @@ from agenticraft_foundation.algebra.refinement import (
     failures_refines,
     trace_refines,
 )
-from agenticraft_foundation.algebra.semantics import LTS, LTSState, Trace, Transition, build_lts
+from agenticraft_foundation.algebra.semantics import LTS, LTSState, Transition
 from agenticraft_foundation.verification.counterexamples import (
     AnnotatedStep,
     CounterexampleExplanation,
@@ -24,7 +24,6 @@ from agenticraft_foundation.verification.counterexamples import (
     explain_refinement_failure,
     find_minimal_counterexample,
 )
-
 
 # =============================================================================
 # Helpers: Build simple processes

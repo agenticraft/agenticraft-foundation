@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import math
-
 import pytest
 
 from agenticraft_foundation.verification.probabilistic import (
@@ -18,7 +16,6 @@ from agenticraft_foundation.verification.probabilistic import (
     expected_steps,
     steady_state,
 )
-
 
 # =============================================================================
 # Helpers: Build Common DTMCs
