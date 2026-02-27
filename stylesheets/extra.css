@@ -1,0 +1,151 @@
+/* AgentiCraft Foundation — Teal brand overrides */
+
+:root {
+  --md-primary-fg-color: #0D9488;
+  --md-primary-fg-color--light: #14B8A6;
+  --md-primary-fg-color--dark: #0F766E;
+  --md-accent-fg-color: #14B8A6;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #0D9488;
+  --md-primary-fg-color--light: #14B8A6;
+  --md-primary-fg-color--dark: #0F766E;
+  --md-accent-fg-color: #14B8A6;
+}
+
+/* Logo sizing — lockup (gem + wordmark + "FOUNDATION") in header */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2.4rem;
+  width: auto;
+}
+
+
+/* Module badges in tables */
+.md-typeset table:not([class]) th {
+  background-color: var(--md-primary-fg-color);
+  color: white;
+}
+
+/* ── MathJax rendering ───────────────────────────────────── */
+
+/* Display math: breathing room above and below */
+.md-typeset .MathJax_Display,
+.md-typeset mjx-container[jax="CHTML"][display="true"] {
+  margin: 1.25em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Inline math: align baseline with surrounding Inter text */
+.md-typeset mjx-container[jax="CHTML"]:not([display="true"]) {
+  vertical-align: baseline;
+}
+
+/* Prevent math from overflowing narrow viewports */
+.md-typeset mjx-container {
+  max-width: 100%;
+}
+
+/* Tables with math: stop cells from getting too cramped */
+.md-typeset table mjx-container {
+  font-size: 0.9em;
+}
+
+/* ── Mermaid diagram zoom controls ──────────────────────── */
+
+.diagram-container {
+  position: relative;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.4rem;
+  margin: 1rem 0;
+  background: var(--md-default-bg-color);
+}
+
+.diagram-inner {
+  overflow: auto;
+  padding: 1rem;
+  cursor: default;
+  /* Prevent text selection while panning */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The mermaid div (shadow host) inside the inner wrapper */
+.diagram-inner > .mermaid {
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.15s ease;
+}
+
+/* Controls toolbar — top-right, visible on hover */
+.diagram-controls {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.diagram-container:hover .diagram-controls,
+.diagram-container:focus-within .diagram-controls {
+  opacity: 1;
+}
+
+.diagram-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.25rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color--light);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.diagram-btn:hover {
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color, #fff);
+  border-color: var(--md-accent-fg-color);
+}
+
+/* Fullscreen state */
+.diagram-container:fullscreen {
+  background: var(--md-default-bg-color);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.diagram-container:fullscreen .diagram-controls {
+  opacity: 1;
+  top: 1rem;
+  right: 1rem;
+}
+
+.diagram-container:fullscreen .diagram-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Mobile: controls always visible */
+@media (max-width: 76.25em) {
+  .diagram-controls {
+    opacity: 1;
+  }
+}

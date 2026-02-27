@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 100" width="430" height="100">
+  <defs>
+    <radialGradient id="n" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#5EEAD4"/>
+      <stop offset="65%" stop-color="#14B8A6" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0D9488" stop-opacity="0.5"/>
+    </radialGradient>
+    <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Gem mark — original brand colors, full opacity -->
+  <g transform="translate(2, -2) scale(0.2)">
+    <polygon points="310,58 420,195 290,215" fill="#99F6E4" opacity="0.92"/>
+    <polygon points="310,58 95,260 290,215" fill="#5EEAD4" opacity="0.85"/>
+    <polygon points="420,195 370,390 290,215" fill="#14B8A6" opacity="0.88"/>
+    <polygon points="370,390 290,215 250,345" fill="#0D9488" opacity="0.9"/>
+    <polygon points="95,260 290,215 250,345" fill="#0F766E" opacity="0.92"/>
+    <polygon points="370,390 175,430 250,345" fill="#115E59" opacity="0.92"/>
+    <polygon points="170,434 90,264 245,349" fill="#134E4A" opacity="0.88"
+             transform="translate(-6, 5)"/>
+    <g filter="url(#g)">
+      <circle cx="310" cy="58"  r="5.5" fill="url(#n)"/>
+      <circle cx="420" cy="195" r="5"   fill="url(#n)"/>
+      <circle cx="370" cy="390" r="5"   fill="url(#n)"/>
+      <circle cx="175" cy="430" r="5"   fill="url(#n)"/>
+      <circle cx="95"  cy="260" r="5.5" fill="url(#n)"/>
+      <circle cx="290" cy="215" r="6"   fill="url(#n)"/>
+      <circle cx="250" cy="345" r="5.5" fill="url(#n)"/>
+    </g>
+  </g>
+
+  <!-- "AgentiCraft" wordmark -->
+  <text x="108" y="62" font-family="'Plus Jakarta Sans', 'Inter', sans-serif"
+        font-size="42" letter-spacing="-0.4">
+    <tspan fill="#FFFFFF" font-weight="600">Agenti</tspan><tspan fill="#F0FDFA" font-weight="800">Craft</tspan>
+  </text>
+</svg>
