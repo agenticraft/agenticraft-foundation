@@ -1,0 +1,209 @@
+site_name: FOUNDATION
+site_url: https://agenticraft.github.io/agenticraft-foundation/
+site_description: Formally verified mathematical foundations for multi-agent AI coordination
+site_author: AgentiCraft Team
+
+repo_name: agenticraft/agenticraft-foundation
+repo_url: https://github.com/agenticraft/agenticraft-foundation
+edit_uri: edit/master/docs/
+
+copyright: Copyright &copy; 2026 AgentiCraft Team
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/favicon.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      separator: '[\s\-\.]+'
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            docstring_section_style: spacy
+            show_root_heading: true
+            show_source: false
+            heading_level: 2
+            members_order: source
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/diagrams.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/agenticraft
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/hYymTuv9
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/agenticraft
+
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Why Formal Methods: getting-started/why-formal-methods.md
+
+  - Concepts:
+    - Overview: concepts/index.md
+    - Process Algebra (CSP): concepts/process-algebra.md
+    - Multiparty Session Types: concepts/session-types.md
+    - Protocol Graph Model: concepts/protocol-graph.md
+    - Spectral Topology: concepts/spectral-topology.md
+    - Consensus & MAS Mappings: concepts/consensus.md
+    - Complexity & Fault Models: concepts/complexity.md
+    - Verification: concepts/verification.md
+
+  - Tutorials:
+    - Overview: tutorials/index.md
+    - Modeling Agent Coordination with CSP: tutorials/csp-coordination.md
+    - Verifying Protocols with Session Types: tutorials/mpst-verification.md
+    - Multi-Protocol Routing: tutorials/protocol-routing.md
+    - Analyzing Mesh Topologies: tutorials/topology-analysis.md
+    - Formal Consensus Verification: tutorials/consensus-verification.md
+    - Checking Temporal Properties with CTL: tutorials/temporal-verification.md
+    - Modeling Stochastic Agents with DTMC: tutorials/probabilistic-analysis.md
+
+  - API Reference:
+    - Overview: api/index.md
+    - types: api/types.md
+    - algebra:
+      - Overview: api/algebra/index.md
+      - csp: api/algebra/csp.md
+      - semantics: api/algebra/semantics.md
+      - equivalence: api/algebra/equivalence.md
+      - refinement: api/algebra/refinement.md
+      - patterns: api/algebra/patterns.md
+    - mpst:
+      - Overview: api/mpst/index.md
+      - types: api/mpst/types.md
+      - global_types: api/mpst/global-types.md
+      - local_types: api/mpst/local-types.md
+      - checker: api/mpst/checker.md
+      - patterns: api/mpst/patterns.md
+    - protocols:
+      - Overview: api/protocols/index.md
+      - graph: api/protocols/graph.md
+      - routing: api/protocols/routing.md
+      - semantic_routing: api/protocols/semantic-routing.md
+      - compatibility: api/protocols/compatibility.md
+      - cost: api/protocols/cost.md
+      - affinity: api/protocols/affinity.md
+      - workflow: api/protocols/workflow.md
+      - transformers: api/protocols/transformers.md
+      - semantic: api/protocols/semantic.md
+      - specifications: api/protocols/specifications.md
+    - topology:
+      - Overview: api/topology/index.md
+      - laplacian: api/topology/laplacian.md
+      - connectivity: api/topology/connectivity.md
+      - hypergraph: api/topology/hypergraph.md
+    - specifications:
+      - Overview: api/specifications/index.md
+      - consensus_spec: api/specifications/consensus-spec.md
+      - weighted_consensus_spec: api/specifications/weighted-consensus.md
+      - mas_mappings: api/specifications/mas-mappings.md
+    - complexity:
+      - Overview: api/complexity/index.md
+      - annotations: api/complexity/annotations.md
+      - bounds: api/complexity/bounds.md
+    - verification:
+      - Overview: api/verification/index.md
+      - invariant_checker: api/verification/invariant-checker.md
+      - counterexamples: api/verification/counterexamples.md
+      - temporal: api/verification/temporal.md
+      - probabilistic: api/verification/probabilistic.md
+    - integration:
+      - Overview: api/integration/index.md
+      - mpst_bridge: api/integration/mpst-bridge.md
+      - csp_orchestration: api/integration/csp-orchestration.md
+
+  - Examples:
+    - Overview: examples/index.md
+    - CSP Composition: examples/csp-composition.md
+    - Interrupt & Timeout: examples/interrupt-timeout.md
+    - Consensus Specification: examples/consensus-spec.md
+    - Mesh Topology: examples/mesh-topology.md
+    - Protocol Verification: examples/protocol-verification.md
+    - Temporal Verification: examples/temporal-verification.md
+    - Probabilistic Verification: examples/probabilistic-verification.md
+    - Counterexample Generation: examples/counterexample-generation.md
+
+  - Contributing: contributing.md
+  - Changelog: changelog.md

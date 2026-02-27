@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agenticraft-foundation"
+dynamic = ["version"]
+description = "Formally verified mathematical foundations for multi-agent AI coordination"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Zaher Khateeb", email = "zaher@agenticraft.ai" },
+]
+keywords = [
+    "csp",
+    "formal-methods",
+    "multi-agent-systems",
+    "session-types",
+    "process-algebra",
+    "verification",
+    "model-checking",
+    "temporal-logic",
+    "markov-chains",
+    "coordination",
+    "ai-agents",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://agenticraft.ai"
+Documentation = "https://github.com/agenticraft/agenticraft-foundation"
+Repository = "https://github.com/agenticraft/agenticraft-foundation"
+Issues = "https://github.com/agenticraft/agenticraft-foundation/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.4",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+]
+
+[tool.hatch.version]
+path = "src/agenticraft_foundation/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agenticraft_foundation"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B"]
+ignore = ["UP038"]
+
+[tool.coverage.run]
+source = ["agenticraft_foundation"]
+
+[tool.coverage.report]
+fail_under = 85

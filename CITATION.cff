@@ -1,0 +1,77 @@
+cff-version: 1.2.0
+title: "agenticraft-foundation: Formally Verified Foundations for Multi-Agent AI"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Khateeb
+    given-names: Zaher
+version: 0.1.0
+date-released: "2026-02-26"
+url: "https://github.com/agenticraft/agenticraft-foundation"
+repository-code: "https://github.com/agenticraft/agenticraft-foundation"
+license: Apache-2.0
+keywords:
+  - process-algebra
+  - CSP
+  - formal-verification
+  - multi-agent-systems
+  - session-types
+  - spectral-topology
+  - model-checking
+  - temporal-logic
+  - markov-chains
+references:
+  - type: book
+    title: "Communicating Sequential Processes"
+    authors:
+      - family-names: Hoare
+        given-names: C. A. R.
+    year: 1985
+    publisher:
+      name: "Prentice Hall"
+  - type: book
+    title: "The Theory and Practice of Concurrency"
+    authors:
+      - family-names: Roscoe
+        given-names: A. W.
+    year: 1998
+    publisher:
+      name: "Prentice Hall"
+  - type: article
+    title: "Multiparty Asynchronous Session Types"
+    authors:
+      - family-names: Honda
+        given-names: Kohei
+      - family-names: Yoshida
+        given-names: Nobuko
+      - family-names: Carbone
+        given-names: Marco
+    year: 2008
+  - type: conference-paper
+    title: "Design and Synthesis of Synchronization Skeletons Using Branching Time Temporal Logic"
+    authors:
+      - family-names: Clarke
+        given-names: Edmund M.
+      - family-names: Emerson
+        given-names: E. Allen
+    year: 1981
+    collection-title: "Workshop on Logics of Programs"
+  - type: book
+    title: "Principles of Model Checking"
+    authors:
+      - family-names: Baier
+        given-names: Christel
+      - family-names: Katoen
+        given-names: Joost-Pieter
+    year: 2008
+    publisher:
+      name: "MIT Press"
+  - type: article
+    title: "A Logic for Reasoning about Time and Reliability"
+    authors:
+      - family-names: Hansson
+        given-names: Hans
+      - family-names: Jonsson
+        given-names: Bengt
+    year: 1994
+    journal: "Formal Aspects of Computing"

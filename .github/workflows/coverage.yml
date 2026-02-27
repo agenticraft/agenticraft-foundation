@@ -1,0 +1,149 @@
+name: Coverage
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: coverage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run full test suite with coverage
+        run: |
+          uv run pytest tests/ -v \
+            --cov=agenticraft_foundation \
+            --cov-report=xml:coverage.xml \
+            --cov-report=json:coverage.json \
+            --cov-report=html:htmlcov \
+            --cov-report=term-missing \
+            --cov-fail-under=85
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov/
+          retention-days: 14
+
+  per-module:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Coverage — algebra
+        run: |
+          uv run pytest tests/test_algebra/ -v \
+            --cov=agenticraft_foundation.algebra \
+            --cov-report=json:coverage-algebra.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — mpst
+        run: |
+          uv run pytest tests/test_mpst/ -v \
+            --cov=agenticraft_foundation.mpst \
+            --cov-report=json:coverage-mpst.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — protocols
+        run: |
+          uv run pytest tests/test_protocols/ -v \
+            --cov=agenticraft_foundation.protocols \
+            --cov-report=json:coverage-protocols.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — topology
+        run: |
+          uv run pytest tests/test_topology/ -v \
+            --cov=agenticraft_foundation.topology \
+            --cov-report=json:coverage-topology.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — verification
+        run: |
+          uv run pytest tests/test_verification/ -v \
+            --cov=agenticraft_foundation.verification \
+            --cov-report=json:coverage-verification.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — specifications
+        run: |
+          uv run pytest tests/test_specifications/ -v \
+            --cov=agenticraft_foundation.specifications \
+            --cov-report=json:coverage-specifications.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — complexity
+        run: |
+          uv run pytest tests/test_complexity/ -v \
+            --cov=agenticraft_foundation.complexity \
+            --cov-report=json:coverage-complexity.json \
+            --cov-report=term-missing || true
+
+      - name: Coverage — integration
+        run: |
+          uv run pytest tests/test_integration/ -v \
+            --cov=agenticraft_foundation.integration \
+            --cov-report=json:coverage-integration.json \
+            --cov-report=term-missing || true
+
+      - name: Generate per-module summary
+        run: |
+          echo "## Per-Module Coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Module | Coverage |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|----------|" >> "$GITHUB_STEP_SUMMARY"
+          for module in algebra mpst protocols topology verification specifications complexity integration; do
+            FILE="coverage-${module}.json"
+            if [ -f "$FILE" ]; then
+              PCT=$(python3 -c "import json; d=json.load(open('$FILE')); print(f\"{d.get('totals', {}).get('percent_covered', 0):.1f}%\")")
+              echo "| ${module} | ${PCT} |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| ${module} | — |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload per-module reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: per-module-coverage
+          path: coverage-*.json
+          retention-days: 30

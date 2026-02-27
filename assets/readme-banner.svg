@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 240" width="1200" height="240">
+  <defs>
+    <radialGradient id="bgG" cx="25%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#0F766E" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="nB" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F0FDFA"/>
+      <stop offset="40%" stop-color="#5EEAD4"/>
+      <stop offset="80%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0D9488" stop-opacity="0.3"/>
+    </radialGradient>
+    <filter id="gB" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Mesh pattern -->
+    <pattern id="meshBn" x="0" y="0" width="320" height="280" patternUnits="userSpaceOnUse">
+      <!-- Open chain -->
+      <line x1="15" y1="35" x2="75" y2="12" stroke="#14B8A6" stroke-width="0.3" opacity="0.05"/>
+      <line x1="75" y1="12" x2="148" y2="28" stroke="#14B8A6" stroke-width="0.35" opacity="0.05"/>
+      <!-- Quad face -->
+      <line x1="148" y1="28" x2="225" y2="18" stroke="#14B8A6" stroke-width="0.3" opacity="0.045"/>
+      <line x1="225" y1="18" x2="260" y2="80" stroke="#14B8A6" stroke-width="0.35" opacity="0.05"/>
+      <line x1="260" y1="80" x2="165" y2="95" stroke="#14B8A6" stroke-width="0.4" opacity="0.06"/>
+      <line x1="165" y1="95" x2="148" y2="28" stroke="#14B8A6" stroke-width="0.35" opacity="0.05"/>
+      <!-- Pentagon cluster -->
+      <line x1="75" y1="12" x2="55" y2="105" stroke="#14B8A6" stroke-width="0.35" opacity="0.055"/>
+      <line x1="55" y1="105" x2="165" y2="95" stroke="#14B8A6" stroke-width="0.45" opacity="0.07"/>
+      <line x1="148" y1="28" x2="165" y2="95" stroke="#14B8A6" stroke-width="0.35" opacity="0.05"/>
+      <line x1="55" y1="105" x2="148" y2="28" stroke="#14B8A6" stroke-width="0.25" opacity="0.03"/>
+      <!-- Sparse lower -->
+      <line x1="55" y1="105" x2="28" y2="195" stroke="#14B8A6" stroke-width="0.3" opacity="0.045"/>
+      <line x1="55" y1="105" x2="140" y2="185" stroke="#14B8A6" stroke-width="0.4" opacity="0.055"/>
+      <line x1="165" y1="95" x2="140" y2="185" stroke="#14B8A6" stroke-width="0.35" opacity="0.05"/>
+      <line x1="260" y1="80" x2="290" y2="175" stroke="#14B8A6" stroke-width="0.3" opacity="0.04"/>
+      <!-- Bottom fading -->
+      <line x1="28" y1="195" x2="140" y2="185" stroke="#14B8A6" stroke-width="0.3" opacity="0.04"/>
+      <line x1="140" y1="185" x2="290" y2="175" stroke="#14B8A6" stroke-width="0.3" opacity="0.03"/>
+      <line x1="28" y1="195" x2="85" y2="260" stroke="#14B8A6" stroke-width="0.25" opacity="0.03"/>
+      <line x1="140" y1="185" x2="210" y2="255" stroke="#14B8A6" stroke-width="0.25" opacity="0.025"/>
+      <!-- Nodes -->
+      <circle cx="15" cy="35" r="0.6" fill="#5EEAD4" opacity="0.06"/>
+      <circle cx="225" cy="18" r="0.7" fill="#5EEAD4" opacity="0.06"/>
+      <circle cx="290" cy="175" r="0.6" fill="#5EEAD4" opacity="0.05"/>
+      <circle cx="85" cy="260" r="0.5" fill="#5EEAD4" opacity="0.04"/>
+      <circle cx="210" cy="255" r="0.5" fill="#5EEAD4" opacity="0.04"/>
+      <circle cx="75" cy="12" r="0.9" fill="#5EEAD4" opacity="0.09"/>
+      <circle cx="148" cy="28" r="1.0" fill="#5EEAD4" opacity="0.1"/>
+      <circle cx="260" cy="80" r="0.9" fill="#5EEAD4" opacity="0.08"/>
+      <circle cx="28" cy="195" r="0.8" fill="#5EEAD4" opacity="0.06"/>
+      <circle cx="55" cy="105" r="3.5" fill="#5EEAD4" opacity="0.02"/>
+      <circle cx="55" cy="105" r="1.2" fill="#5EEAD4" opacity="0.14"/>
+      <circle cx="165" cy="95" r="3.5" fill="#5EEAD4" opacity="0.018"/>
+      <circle cx="165" cy="95" r="1.1" fill="#5EEAD4" opacity="0.12"/>
+      <circle cx="140" cy="185" r="3" fill="#5EEAD4" opacity="0.015"/>
+      <circle cx="140" cy="185" r="1.0" fill="#5EEAD4" opacity="0.09"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="240" rx="12" fill="#0F172A"/>
+  <rect width="1200" height="240" rx="12" fill="url(#bgG)"/>
+  <rect width="1200" height="240" rx="12" fill="url(#meshBn)"/>
+
+  <!-- Gem mark (compact, left) — scale 0.35 -->
+  <g transform="translate(50, 22) scale(0.35)">
+    <polygon points="310,58 420,195 290,215" fill="#5EEAD4" opacity="0.45"/>
+    <polygon points="310,58 95,260 290,215" fill="#14B8A6" opacity="0.35"/>
+    <polygon points="420,195 370,390 290,215" fill="#0D9488" opacity="0.38"/>
+    <polygon points="370,390 290,215 250,345" fill="#0F766E" opacity="0.4"/>
+    <polygon points="95,260 290,215 250,345" fill="#0F766E" opacity="0.5"/>
+    <polygon points="370,390 175,430 250,345" fill="#115E59" opacity="0.55"/>
+    <polygon points="170,434 90,264 245,349" fill="#0F766E" opacity="0.45" transform="translate(-8,7)"/>
+    <polygon points="310,58 420,195 370,390 175,430 95,260"
+             fill="none" stroke="#14B8A6" stroke-width="1.2" opacity="0.25"/>
+    <g filter="url(#gB)">
+      <circle cx="310" cy="58"  r="7"   fill="url(#nB)"/>
+      <circle cx="420" cy="195" r="6.5" fill="url(#nB)"/>
+      <circle cx="370" cy="390" r="6.5" fill="url(#nB)"/>
+      <circle cx="175" cy="430" r="6.5" fill="url(#nB)"/>
+      <circle cx="95"  cy="260" r="7"   fill="url(#nB)"/>
+      <circle cx="290" cy="215" r="7.5" fill="url(#nB)"/>
+      <circle cx="250" cy="345" r="7"   fill="url(#nB)"/>
+    </g>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="265" y="90" font-family="'Plus Jakarta Sans', 'Inter', sans-serif"
+        font-size="44" letter-spacing="-0.5">
+    <tspan fill="#F0FDFA" font-weight="600">Agenti</tspan><tspan fill="#14B8A6" font-weight="800">Craft</tspan>
+  </text>
+  <!-- Sub-name (inline right of wordmark) -->
+  <text x="530" y="90" font-family="'Plus Jakarta Sans', 'Inter', sans-serif"
+        font-size="20" font-weight="300" fill="#94A3B8" letter-spacing="3">
+    FOUNDATION
+  </text>
+
+  <!-- Tagline -->
+  <text x="268" y="122" font-family="'Plus Jakarta Sans', 'Inter', sans-serif"
+        font-size="15" font-weight="400" fill="#64748B" letter-spacing="0.3">
+    Formally verified mathematical foundations for multi-agent AI coordination
+  </text>
+
+  <!-- Feature pills -->
+  <g transform="translate(268, 150)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="135" height="26" rx="13" fill="#14B8A6" opacity="0.12"/>
+    <text x="67" y="17" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="11" font-weight="500"
+          fill="#14B8A6" text-anchor="middle">13 CSP Operators</text>
+
+    <!-- Pill 2 -->
+    <rect x="147" y="0" width="128" height="26" rx="13" fill="#334155" opacity="0.4"/>
+    <text x="211" y="17" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="11" font-weight="500"
+          fill="#94A3B8" text-anchor="middle">Session Types</text>
+
+    <!-- Pill 3 -->
+    <rect x="287" y="0" width="138" height="26" rx="13" fill="#334155" opacity="0.4"/>
+    <text x="356" y="17" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="11" font-weight="500"
+          fill="#94A3B8" text-anchor="middle">CTL Verification</text>
+
+    <!-- Pill 4 -->
+    <rect x="437" y="0" width="135" height="26" rx="13" fill="#334155" opacity="0.4"/>
+    <text x="504" y="17" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="11" font-weight="500"
+          fill="#94A3B8" text-anchor="middle">DTMC Analysis</text>
+
+    <!-- Pill 5 -->
+    <rect x="584" y="0" width="148" height="26" rx="13" fill="#334155" opacity="0.4"/>
+    <text x="658" y="17" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="11" font-weight="500"
+          fill="#94A3B8" text-anchor="middle">Zero Dependencies</text>
+  </g>
+
+  <!-- Bottom accent -->
+  <rect x="0" y="235" width="1200" height="5" rx="0" fill="#14B8A6" opacity="0.5"/>
+</svg>
