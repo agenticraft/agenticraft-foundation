@@ -115,9 +115,7 @@ jobs:
         run: uv sync --group dev
 
       - name: Bandit security check
-        run: |
-          uv pip install bandit
-          uv run bandit -r src/agenticraft_foundation/ -ll
+        run: uvx bandit -r src/agenticraft_foundation/ -ll
 
   build:
     runs-on: ubuntu-latest
@@ -135,9 +133,7 @@ jobs:
         run: uv build
 
       - name: Verify package
-        run: |
-          uv pip install twine
-          uv run twine check dist/*
+        run: uvx twine check dist/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
