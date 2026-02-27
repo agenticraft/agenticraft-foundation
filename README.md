@@ -8,10 +8,10 @@
 
 <br/>
 
-[![CI](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml/badge.svg)](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/main/graph/badge.svg)](https://codecov.io/gh/agenticraft/agenticraft-foundation)
-[![python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/agenticraft/agenticraft-foundation/ci.yml?style=flat-square&label=CI)](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/main/graph/badge.svg?style=flat-square)](https://codecov.io/gh/agenticraft/agenticraft-foundation)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://www.python.org/downloads/)
+[![license](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
 
 **Formally verified mathematical foundations for multi-agent AI coordination.**
 

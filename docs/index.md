@@ -1,7 +1,7 @@
 # AgentiCraft Foundation
 
 ![CI](https://img.shields.io/github/actions/workflow/status/agenticraft/agenticraft-foundation/ci.yml?style=flat-square&label=CI)
-![Coverage](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/main/graph/badge.svg)
+![Coverage](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/main/graph/badge.svg?style=flat-square)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square)
 
