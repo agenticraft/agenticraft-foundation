@@ -48,9 +48,7 @@ jobs:
         run: uv build
 
       - name: Verify package
-        run: |
-          uv pip install twine
-          uv run twine check dist/*
+        run: uvx twine check dist/*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
