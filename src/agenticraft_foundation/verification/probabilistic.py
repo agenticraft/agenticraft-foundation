@@ -14,8 +14,8 @@ Key insight for LLM agents: agents are inherently stochastic. The LTS/CSP
 framework handles non-determinism (what CAN happen), but DTMC handles
 probability (how LIKELY things are). This module bridges the gap.
 
-Implementation uses pure Python (no numpy/scipy dependency):
-- Gaussian elimination for small systems (< 100 states)
+Implementation:
+- numpy for linear system solving (Gaussian elimination / LU decomposition)
 - Value iteration fallback for larger systems
 """
 
@@ -337,59 +337,31 @@ def _gaussian_elimination(
     a_matrix: list[list[float]],
     b_vector: list[float],
 ) -> list[float]:
-    """Solve Ax = b via Gaussian elimination with partial pivoting.
+    """Solve Ax = b using numpy's linear algebra solver.
+
+    Uses LU decomposition (np.linalg.solve) for the common case,
+    falling back to least-squares (np.linalg.lstsq) for singular systems.
 
     Args:
-        a_matrix: Coefficient matrix (n × n), modified in place.
-        b_vector: Right-hand side vector (n), modified in place.
+        a_matrix: Coefficient matrix (n × n).
+        b_vector: Right-hand side vector (n).
 
     Returns:
         Solution vector x.
-
-    Raises:
-        ValueError: If the system is singular.
     """
-    n = len(b_vector)
+    import numpy as np
 
-    # Forward elimination with partial pivoting
-    for col in range(n):
-        # Find pivot
-        max_row = col
-        max_val = abs(a_matrix[col][col])
-        for row in range(col + 1, n):
-            if abs(a_matrix[row][col]) > max_val:
-                max_val = abs(a_matrix[row][col])
-                max_row = row
+    a_arr = np.array(a_matrix, dtype=np.float64)
+    b_arr = np.array(b_vector, dtype=np.float64)
 
-        # Swap rows
-        if max_row != col:
-            a_matrix[col], a_matrix[max_row] = a_matrix[max_row], a_matrix[col]
-            b_vector[col], b_vector[max_row] = b_vector[max_row], b_vector[col]
+    try:
+        x = np.linalg.solve(a_arr, b_arr)
+    except np.linalg.LinAlgError:
+        # Singular matrix — fall back to least-squares (minimum-norm solution)
+        x, _, _, _ = np.linalg.lstsq(a_arr, b_arr, rcond=None)
 
-        pivot = a_matrix[col][col]
-        if abs(pivot) < _EPSILON:
-            # Singular — set this variable to 0
-            continue
-
-        # Eliminate below
-        for row in range(col + 1, n):
-            factor = a_matrix[row][col] / pivot
-            for j in range(col, n):
-                a_matrix[row][j] -= factor * a_matrix[col][j]
-            b_vector[row] -= factor * b_vector[col]
-
-    # Back substitution
-    x = [0.0] * n
-    for row in range(n - 1, -1, -1):
-        if abs(a_matrix[row][row]) < _EPSILON:
-            x[row] = 0.0
-            continue
-        x[row] = b_vector[row]
-        for col in range(row + 1, n):
-            x[row] -= a_matrix[row][col] * x[col]
-        x[row] /= a_matrix[row][row]
-
-    return x
+    result: list[float] = x.tolist()
+    return result
 
 
 def _value_iteration(

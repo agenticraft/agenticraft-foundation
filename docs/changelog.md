@@ -2,7 +2,7 @@
 
 All notable changes to agenticraft-foundation are documented here.
 
-## 0.1.0 (2026-02-26)
+## 0.1.0 (2026-02-28)
 
 Initial release of the formally verified mathematical foundations for multi-agent AI coordination.
 
@@ -60,8 +60,8 @@ Initial release of the formally verified mathematical foundations for multi-agen
 - **CSP orchestration**: adapter applying CSP processes to workflow verification (DAG-to-CSP)
 
 #### Package
-- Zero runtime dependencies, pure Python
+- Minimal dependencies (NumPy only), Python 3.10+
 - Python 3.10, 3.11, 3.12, 3.13 support
-- 1,165 tests with 89%+ coverage
+- 1,300+ tests with 93%+ coverage
 - Apache 2.0 license
 - Type-checked with mypy strict mode

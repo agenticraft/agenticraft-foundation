@@ -510,6 +510,111 @@ class TestProtocolCompatibilityMatrix:
         assert "avg_semantic_loss" in stats
         assert stats["full_compatibility"] > 0
 
+    def test_get_semantic_loss_incompatible(self, compat_matrix):
+        """Test semantic loss is 1.0 for incompatible protocols."""
+        # Register an incompatible relation
+        from agenticraft_foundation.types import ProtocolName
+
+        incompatible_rel = CompatibilityRelation(
+            source=ProtocolName.MCP,
+            target=ProtocolName.MCP,  # Override self-compat to NONE for test
+            level=CompatibilityLevel.NONE,
+            semantic_loss=1.0,
+            reversible=False,
+        )
+        # Use a fresh matrix with only this relation
+        custom = ProtocolCompatibilityMatrix(
+            {(ProtocolName.MCP, ProtocolName.A2A): incompatible_rel}
+        )
+        loss = custom.get_semantic_loss(ProtocolName.MCP, ProtocolName.A2A)
+        assert loss == 1.0
+
+    def test_get_best_translation_path_indirect(self, compat_matrix):
+        """Test indirect path via intermediary protocol."""
+        from agenticraft_foundation.types import ProtocolName
+
+        # Create a matrix where A->C has no direct path but A->B->C works
+        a_to_b = CompatibilityRelation(
+            source=ProtocolName.MCP,
+            target=ProtocolName.A2A,
+            level=CompatibilityLevel.PARTIAL,
+            semantic_loss=0.1,
+        )
+        b_to_c = CompatibilityRelation(
+            source=ProtocolName.A2A,
+            target=ProtocolName.CUSTOM,
+            level=CompatibilityLevel.PARTIAL,
+            semantic_loss=0.2,
+        )
+        # No direct MCP->CUSTOM
+        matrix = ProtocolCompatibilityMatrix(
+            {
+                (ProtocolName.MCP, ProtocolName.A2A): a_to_b,
+                (ProtocolName.A2A, ProtocolName.CUSTOM): b_to_c,
+            }
+        )
+        path = matrix.get_best_translation_path(ProtocolName.MCP, ProtocolName.CUSTOM, max_hops=2)
+        assert path is not None
+        assert len(path) == 3
+        assert path[0] == ProtocolName.MCP
+        assert path[1] == ProtocolName.A2A
+        assert path[2] == ProtocolName.CUSTOM
+
+    def test_get_best_translation_path_no_path(self, compat_matrix):
+        """Test returns None when no path exists (incompatible)."""
+        from agenticraft_foundation.types import ProtocolName
+
+        # Create a matrix with only NONE-level relations (no compatible path)
+        no_compat = {
+            (ProtocolName.MCP, ProtocolName.A2A): CompatibilityRelation(
+                source=ProtocolName.MCP,
+                target=ProtocolName.A2A,
+                level=CompatibilityLevel.NONE,
+                semantic_loss=1.0,
+            ),
+            (ProtocolName.A2A, ProtocolName.CUSTOM): CompatibilityRelation(
+                source=ProtocolName.A2A,
+                target=ProtocolName.CUSTOM,
+                level=CompatibilityLevel.NONE,
+                semantic_loss=1.0,
+            ),
+            (ProtocolName.MCP, ProtocolName.CUSTOM): CompatibilityRelation(
+                source=ProtocolName.MCP,
+                target=ProtocolName.CUSTOM,
+                level=CompatibilityLevel.NONE,
+                semantic_loss=1.0,
+            ),
+        }
+        matrix = ProtocolCompatibilityMatrix(no_compat)
+        path = matrix.get_best_translation_path(ProtocolName.MCP, ProtocolName.A2A, max_hops=2)
+        assert path is None
+
+    def test_get_best_translation_path_max_hops_1(self, compat_matrix):
+        """Test max_hops=1 disallows indirect routing."""
+        from agenticraft_foundation.types import ProtocolName
+
+        # Create a matrix with no direct path
+        a_to_b = CompatibilityRelation(
+            source=ProtocolName.MCP,
+            target=ProtocolName.A2A,
+            level=CompatibilityLevel.PARTIAL,
+            semantic_loss=0.1,
+        )
+        b_to_c = CompatibilityRelation(
+            source=ProtocolName.A2A,
+            target=ProtocolName.CUSTOM,
+            level=CompatibilityLevel.PARTIAL,
+            semantic_loss=0.2,
+        )
+        matrix = ProtocolCompatibilityMatrix(
+            {
+                (ProtocolName.MCP, ProtocolName.A2A): a_to_b,
+                (ProtocolName.A2A, ProtocolName.CUSTOM): b_to_c,
+            }
+        )
+        path = matrix.get_best_translation_path(ProtocolName.MCP, ProtocolName.CUSTOM, max_hops=1)
+        assert path is None
+
 
 # ===========================================================================
 # affinity.py Tests

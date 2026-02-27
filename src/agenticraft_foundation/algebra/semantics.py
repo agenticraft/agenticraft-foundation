@@ -129,7 +129,17 @@ class LTSBuilder:
     """Builds an LTS from a CSP process through state space exploration.
 
     Uses breadth-first exploration to discover all reachable states
-    and transitions.
+    and transitions. State identity is determined by ``_state_key()``
+    of the process term -- structurally identical terms produce the
+    same tuple key and map to the same state. This is conservative:
+    semantically equivalent but structurally different terms may
+    create duplicate states, which increases the state space but
+    never misses behaviors.
+
+    Note: Processes containing callables (e.g., Guard) use object
+    identity (``id()``) in their state key, so distinct Guard
+    instances with equivalent conditions will be treated as
+    different states.
     """
 
     def __init__(self, max_states: int = 10000, max_depth: int = 1000):
@@ -152,13 +162,13 @@ class LTSBuilder:
             The resulting LTS
         """
         lts = LTS()
-        seen_processes: dict[str, int] = {}  # repr -> state_id
+        seen_processes: dict[tuple[object, ...], int] = {}  # _state_key -> state_id
         queue: deque[tuple[Process, int, int]] = deque()  # (process, state_id, depth)
 
         next_id = 0
 
         # Create initial state
-        initial_repr = repr(process)
+        initial_key = process._state_key()
         initial_state = LTSState(
             id=next_id,
             process=process,
@@ -166,7 +176,7 @@ class LTSBuilder:
             is_deadlock=process.is_deadlocked(),
         )
         lts.add_state(initial_state)
-        seen_processes[initial_repr] = next_id
+        seen_processes[initial_key] = next_id
         queue.append((process, next_id, 0))
         next_id += 1
 
@@ -181,7 +191,7 @@ class LTSBuilder:
             for event in current_process.initials():
                 try:
                     next_process = current_process.after(event)
-                    next_repr = repr(next_process)
+                    next_key = next_process._state_key()
 
                     # If we reached this state via TICK, it's terminal
                     # A state can be BOTH terminal AND deadlock if reachable both ways
@@ -189,8 +199,8 @@ class LTSBuilder:
                     is_deadlock_path = not reached_via_tick and next_process.is_deadlocked()
 
                     # Check if we've seen this state
-                    if next_repr in seen_processes:
-                        target_id = seen_processes[next_repr]
+                    if next_key in seen_processes:
+                        target_id = seen_processes[next_key]
                         existing = lts.states[target_id]
                         # Update terminal/deadlock flags based on this path
                         if reached_via_tick:
@@ -206,7 +216,7 @@ class LTSBuilder:
                             is_deadlock=is_deadlock_path,
                         )
                         lts.add_state(next_state)
-                        seen_processes[next_repr] = target_id
+                        seen_processes[next_key] = target_id
                         queue.append((next_process, target_id, depth + 1))
                         next_id += 1
 

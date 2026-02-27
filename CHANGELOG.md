@@ -1,28 +1,15 @@
 # Changelog
 
-## Unreleased
+All notable changes to agenticraft-foundation will be documented in this file.
 
-### Added
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- **Counterexample generation**: Structured failure explanations for refinement and equivalence checking -- `explain_refinement_failure()`, `explain_equivalence_failure()`, `find_minimal_counterexample()` with annotated traces showing exact divergence points
-- **CTL temporal logic model checking**: Formula AST (Atomic, Not, And, Or, Implies, EX, EF, EG, EU, AX, AF, AG, AU) with backward fixpoint computation -- `model_check()`, `check_safety()`, `check_liveness()`
-- **Probabilistic verification (DTMC)**: Discrete-Time Markov Chain representation, reachability probability via Gaussian elimination, steady-state distribution via power iteration, expected steps analysis -- `DTMC`, `check_reachability()`, `steady_state()`, `expected_steps()`
-- 3 runnable examples: `temporal_verification.py`, `probabilistic_verification.py`, `counterexample_generation.py`
-- 172 new tests (37 counterexamples + 81 temporal + 54 probabilistic)
+## [Unreleased]
 
-### Changed
+## [0.1.0] - 2026-02-28
 
-- Test count: 1012 → 1165
-- Verification module: 1 submodule (invariant checker) → 4 submodules
-- Integration module: removed all proprietary imports, now fully standalone with zero external dependencies
-
-### Fixed
-
-- 9 mypy strict-mode errors in `invariant_checker.py` (missing return type annotations, ParamSpec incompatibility)
-
-## 0.1.0 (2026-02-26)
-
-Initial release.
+Initial release of the formally verified mathematical foundations for multi-agent AI coordination.
 
 ### Added
 
@@ -32,8 +19,20 @@ Initial release.
 - **Process equivalence**: trace equivalence, strong/weak bisimulation, failures equivalence
 - **Refinement checking**: trace refinement, failures refinement, failures-divergence refinement
 - **Coordination patterns**: request-response, pipeline, scatter-gather, barrier, mutex, producer-consumer
-- **Multiparty Session Types (MPST)**: global types, local types, projection, well-formedness checking, session monitoring
-- **Spectral topology analysis**: graph Laplacian, algebraic connectivity, consensus convergence bounds
-- **Protocol analysis**: formal protocol definitions and verification
-- **1012 tests** with 85%+ coverage
-- Zero runtime dependencies, pure Python, Python 3.10+
+- **Multiparty Session Types (MPST)**: global types, local types, projection, well-formedness checking, session monitoring, 4 communication patterns
+- **Protocol graph model**: `ProtocolGraph`, Dijkstra/BFS/resilient/semantic routing, compatibility matrix, workflow validation, composable transformers
+- **Spectral topology**: Laplacian analysis, algebraic connectivity, bridge detection, hypergraph group coordination
+- **Formal specifications**: consensus properties (agreement, validity, integrity, termination), weighted quorum consensus, MAS theory mappings (BDI, Joint Intentions, SharedPlans, Contract Net)
+- **Complexity analysis**: 30+ bounds, 8 fault models (4 classical + 4 LLM-specific), impossibility results (FLP, Byzantine)
+- **Verification**: invariant checker, CTL temporal logic model checking (`AG`, `AF`, `EF`, `EG`, `AU`, `EU`, `AX`, `EX`), probabilistic verification (DTMC reachability, steady-state, expected steps), counterexample generation
+- **Integration**: MPST bridge adapter (MCP/A2A session types), CSP orchestration adapter (DAG-to-CSP)
+- Structural `_state_key()` on all 15 Process subclasses for efficient LTS construction
+- 9 runnable examples including end-to-end RAG pipeline verification
+- Scalability & limits documentation, comparison with SPIN/FDR4/TLA+/LangGraph/CrewAI
+- 1,300+ tests with 93%+ coverage, 90% minimum enforced
+- Minimal dependencies (NumPy only), Python 3.10+
+- Type-checked with mypy strict mode
+- Apache 2.0 license
+
+[Unreleased]: https://github.com/agenticraft/agenticraft-foundation/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/agenticraft/agenticraft-foundation/releases/tag/v0.1.0

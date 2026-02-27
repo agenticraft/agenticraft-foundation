@@ -15,13 +15,17 @@
 
 **Formally verified mathematical foundations for multi-agent AI coordination.**
 
-13 CSP operators &middot; Multiparty Session Types &middot; Hypergraph Topology &middot; Multi-Protocol Routing &middot; CTL Model Checking &middot; Probabilistic Verification &middot; 1165 tests &middot; Zero dependencies
+The core verification engine behind [AgentiCraft](https://agenticraft.ai) — an enterprise-grade platform for building production-ready AI agents and multi-agent systems.
+
+13 CSP operators &middot; Multiparty Session Types &middot; Hypergraph Topology &middot; Multi-Protocol Routing &middot; CTL Model Checking &middot; Probabilistic Verification &middot; 1300+ tests &middot; Minimal dependencies
 
 </div>
 
 ---
 
 ## Install
+
+With [uv](https://docs.astral.sh/uv/) (recommended):
 
 ```bash
 uv add agenticraft-foundation
@@ -34,8 +38,6 @@ pip install agenticraft-foundation
 ```
 
 ## Quick Start
-
-### Process Algebra
 
 ```python
 from agenticraft_foundation import (
@@ -74,113 +76,7 @@ t = list(traces(lts, max_length=5))
 print(f"Traces: {len(t)}")
 ```
 
-### Multi-Protocol Routing
-
-```python
-from agenticraft_foundation.protocols import (
-    ProtocolGraph,
-    ProtocolAwareDijkstra,
-    ProtocolConstrainedBFS,
-    ResilientRouter,
-    PathCostCalculator,
-    ProtocolCompatibilityMatrix,
-    PROTOCOL_COMPATIBILITY,
-)
-from agenticraft_foundation.types import ProtocolName
-
-# Build a protocol graph G = (V, E, P, Φ, Γ)
-graph = ProtocolGraph()
-graph.add_agent("gateway", ["routing"], {ProtocolName.MCP, ProtocolName.A2A})
-graph.add_agent("analyzer", ["analysis"], {ProtocolName.MCP})
-graph.add_agent("executor", ["execution"], {ProtocolName.A2A})
-graph.add_agent("reporter", ["output"], {ProtocolName.MCP, ProtocolName.A2A})
-
-graph.add_edge("gateway", "analyzer", {ProtocolName.MCP})
-graph.add_edge("gateway", "executor", {ProtocolName.A2A})
-graph.add_edge("analyzer", "reporter", {ProtocolName.MCP})
-graph.add_edge("executor", "reporter", {ProtocolName.A2A})
-
-compat = ProtocolCompatibilityMatrix(PROTOCOL_COMPATIBILITY)
-calc = PathCostCalculator(graph, compat)
-
-# Dijkstra: minimum-cost routing with protocol translation
-dijkstra = ProtocolAwareDijkstra(graph, compat, calc)
-route = dijkstra.find_optimal_route("gateway", "reporter", ProtocolName.MCP)
-print(f"Path: {route.path}, Cost: {route.total_cost:.2f}")
-
-# BFS: minimum-hop routing
-bfs = ProtocolConstrainedBFS(graph, compat, calc)
-shortest = bfs.find_shortest_path("gateway", "reporter", ProtocolName.MCP)
-print(f"Hops: {shortest.num_hops}")
-
-# Resilient routing with failover
-router = ResilientRouter(graph, compat, calc)
-resilient = router.find_resilient_route(
-    "gateway", "reporter", ProtocolName.A2A,
-    failed_protocols=set(), failed_agents={"analyzer"},
-)
-print(f"Failover path: {resilient.path}")
-```
-
-### Hypergraph Topology
-
-```python
-from agenticraft_foundation.topology import HypergraphNetwork
-
-# Model group coordination as hypergraph H = (V, E_h)
-hg = HypergraphNetwork()
-hg.add_hyperedge("team_a", {"agent1", "agent2", "agent3"}, weight=2.0)
-hg.add_hyperedge("team_b", {"agent2", "agent3", "agent4"}, weight=1.5)
-hg.add_hyperedge("all_hands", {"agent1", "agent2", "agent3", "agent4"})
-
-# Spectral analysis: L_H = D_v − H W D_e⁻¹ Hᵀ
-analysis = hg.analyze()
-print(f"Algebraic connectivity (λ₂): {analysis.algebraic_connectivity:.4f}")
-print(f"Consensus bound: {analysis.consensus_bound:.2f}")
-print(f"Connected: {analysis.is_connected}")
-
-# Group coordination metrics
-coord = hg.analyze_group_coordination()
-print(f"Participation ratio: {coord['participation_ratio']:.2f}")
-print(f"Average group size: {coord['avg_group_size']:.1f}")
-```
-
-### Protocol Workflows
-
-```python
-from agenticraft_foundation.protocols import (
-    ProtocolWorkflow, WorkflowTask, WorkflowValidator,
-    OptimalProtocolAssigner,
-)
-from agenticraft_foundation.types import ProtocolName
-
-# Define workflow W = (T, ≺, ρ)
-workflow = ProtocolWorkflow(workflow_id="data_pipeline")
-workflow.add_task(WorkflowTask(
-    task_id="extract", capabilities=["data_access"],
-    compatible_protocols={ProtocolName.MCP, ProtocolName.A2A},
-))
-workflow.add_task(WorkflowTask(
-    task_id="transform", capabilities=["processing"],
-    compatible_protocols={ProtocolName.MCP},
-))
-workflow.add_task(WorkflowTask(
-    task_id="load", capabilities=["storage"],
-    compatible_protocols={ProtocolName.MCP, ProtocolName.A2A},
-))
-workflow.add_edge("extract", "transform")
-workflow.add_edge("transform", "load")
-
-# Validate executability (Theorem 9)
-validator = WorkflowValidator()
-result = validator.validate(workflow, graph, compat)
-print(f"Valid: {result.is_valid}, Errors: {result.errors}")
-
-# Optimal protocol assignment (minimize translation cost)
-assigner = OptimalProtocolAssigner()
-assignment = assigner.assign(workflow, graph, compat, calc)
-print(f"Protocol assignment: {assignment}")
-```
+See the [RAG pipeline verification](examples/rag_pipeline_verification.py) for an end-to-end example combining CSP, deadlock detection, topology analysis, and temporal logic across 4 agents. More examples in the [docs](https://agenticraft.github.io/agenticraft-foundation/examples/).
 
 ## Architecture
 
@@ -271,47 +167,6 @@ graph TB
 
 All 13 CSP operators implement the full `Process` contract: `kind`, `alphabet()`, `initials()`, `after(event)`.
 
-```mermaid
-graph LR
-    process(["Process<br/><i>abstract base</i>"])
-
-    subgraph primitives["Core Primitives"]
-        direction TB
-        stop["Stop &bull; STOP"]
-        skip["Skip &bull; SKIP"]
-        pre["Prefix &bull; a &rarr; P"]
-        ec["ExternalChoice &bull; P &#9633; Q"]
-        ic["InternalChoice &bull; P &#8851; Q"]
-        par["Parallel &bull; P &#8214; Q"]
-        seq["Sequential &bull; P ; Q"]
-        hid["Hiding &bull; P \\ H"]
-    end
-
-    subgraph extensions["Agent Extensions"]
-        direction TB
-        int["Interrupt &bull; P &#9651; Q"]
-        tmo["Timeout &bull; Timeout P,d,Q"]
-        grd["Guard &bull; Guard c,P"]
-        ren["Rename &bull; P a&larr;b"]
-        pip["Pipe &bull; P |&gt; Q"]
-    end
-
-    subgraph recursion["Recursion"]
-        direction TB
-        rec["Recursion &bull; &mu;X.P"]
-        var["Variable &bull; X"]
-    end
-
-    process --> primitives
-    process --> extensions
-    process --> recursion
-
-    style process fill:#0D9488,stroke:#0F766E,color:#fff
-    style primitives fill:#f0fdfa,stroke:#0D9488
-    style extensions fill:#f0fdfa,stroke:#14B8A6
-    style recursion fill:#f0fdfa,stroke:#0D9488
-```
-
 ### Core Primitives (8)
 
 | Operator | Symbol | Description |
@@ -335,139 +190,7 @@ graph LR
 | `Rename` | `P[[a<-b]]` | Event vocabulary mapping | Protocol bridging between agents |
 | `Pipe` | `P \|> Q` | Producer-consumer pipeline | RAG pipeline, multi-stage processing |
 
-### Recursion
-
-```python
-from agenticraft_foundation import Recursion, Variable, Event, Prefix
-
-# Recursive server: handle requests forever
-req, resp = Event("request"), Event("response")
-server = Recursion(
-    variable="X",
-    body=Prefix(req, Prefix(resp, Variable("X")))
-)
-```
-
-## Verification Pipeline
-
-```mermaid
-flowchart LR
-    P["CSP Process"] --> LTS["Build LTS<br/><code>build_lts</code>"]
-
-    LTS --> DL["Deadlock Detection<br/><code>detect_deadlock</code>"]
-    LTS --> TR["Trace Extraction<br/><code>traces</code>"]
-    LTS --> LV["Liveness Analysis<br/><code>analyze_liveness</code>"]
-    LTS --> CTL["CTL Model Checking<br/><code>model_check</code>"]
-    LTS --> DTMC["Probabilistic<br/><code>check_reachability</code>"]
-
-    TR --> TE["Trace Equivalence<br/><code>trace_equivalent</code>"]
-    TR --> FR["Failures Refinement<br/><code>failures_refines</code>"]
-    TR --> FD["FD Refinement<br/><code>fd_refines</code>"]
-    TR --> BS["Bisimulation<br/><code>strong_bisimilar</code>"]
-
-    FR -->|"failure"| CEX["Counterexample<br/><code>explain_refinement_failure</code>"]
-    BS -->|"failure"| CEX
-
-    TE --> V{{"Verified"}}
-    FR --> V
-    FD --> V
-    BS --> V
-    DL --> V
-    LV --> V
-    CTL --> V
-    DTMC --> V
-    CEX --> V
-
-    style P fill:#0D9488,stroke:#0F766E,color:#fff
-    style LTS fill:#14B8A6,stroke:#0F766E,color:#fff
-    style V fill:#0D9488,stroke:#0F766E,color:#fff
-```
-
-### CTL Temporal Logic
-
-```python
-from agenticraft_foundation import build_lts, Event, Prefix, ExternalChoice, Stop
-from agenticraft_foundation.verification import (
-    model_check, AG, AF, EF, Not, Atomic, check_safety, check_liveness,
-)
-
-# Build an LTS from a CSP process
-req, resp, err = Event("req"), Event("resp"), Event("err")
-process = Prefix(req, ExternalChoice(
-    Prefix(resp, Stop()),
-    Prefix(err, Stop()),
-))
-lts = build_lts(process)
-
-# Label states with atomic propositions
-labeling = {s: set() for s in lts.states}
-labeling[lts.initial_state].add("init")
-for s in lts.states:
-    if not lts.successors(s):  # terminal states
-        labeling[s].add("done")
-
-# Check: "from every reachable state, done is eventually reached"
-result = model_check(lts, AF(Atomic("done")), labeling)
-print(f"Always terminates: {result.satisfied}")
-
-# Check: "error is never reachable"
-result = check_safety(lts, "error", labeling)
-print(f"Error-free: {result.satisfied}")
-if not result.satisfied:
-    print(f"Counterexample: {result.counterexample}")
-```
-
-### Probabilistic Verification (DTMC)
-
-```python
-from agenticraft_foundation.verification import (
-    DTMC, check_reachability, steady_state, expected_steps,
-)
-
-# Model an LLM agent with retry logic
-dtmc = DTMC()
-dtmc.add_state(0, labels={"start"})
-dtmc.add_state(1, labels={"processing"})
-dtmc.add_state(2, labels={"success"})
-dtmc.add_state(3, labels={"error"})
-dtmc.add_transition(0, 1, probability=1.0)
-dtmc.add_transition(1, 2, probability=0.9)   # 90% success
-dtmc.add_transition(1, 3, probability=0.1)   # 10% transient failure
-dtmc.add_transition(3, 1, probability=0.8)   # 80% retry succeeds
-dtmc.add_transition(3, 3, probability=0.2)   # 20% stays in error
-dtmc.add_transition(2, 2, probability=1.0)   # absorbing
-
-# What's the probability of eventually reaching success?
-result = check_reachability(dtmc, target_labels={"success"})
-print(f"P(eventually success) = {result.probability:.4f}")
-
-# Expected number of steps to reach success
-steps = expected_steps(dtmc, target_labels={"success"})
-print(f"E[steps to success] = {steps.expected:.2f}")
-```
-
-### Counterexample Generation
-
-```python
-from agenticraft_foundation import Event, Prefix, ExternalChoice, Stop
-from agenticraft_foundation.algebra import trace_refines
-from agenticraft_foundation.verification import explain_refinement_failure
-
-# Spec allows req then either resp or close
-req, resp, close = Event("req"), Event("resp"), Event("close")
-spec = Prefix(req, ExternalChoice(Prefix(resp, Stop()), Prefix(close, Stop())))
-
-# Impl only handles resp (missing close)
-impl = Prefix(req, Prefix(resp, Stop()))
-
-result = trace_refines(spec, impl)
-if not result.is_valid:
-    explanation = explain_refinement_failure(spec, impl, result)
-    print(explanation.summary)
-    # "Impl trace ⟨req⟩ diverges from spec at step 1"
-    print(f"Spec allowed: {explanation.spec_allowed}")
-    print(f"Impl attempted: {explanation.impl_attempted}")
-```
+See the [full operator reference](https://agenticraft.github.io/agenticraft-foundation/concepts/process-algebra/) for recursion, verification pipeline, and detailed semantics.
 
 ## Modules
 
@@ -482,186 +205,7 @@ if not result.is_valid:
 | `verification` | Runtime invariant checking, structured counterexample generation, CTL temporal logic model checking, probabilistic verification (DTMC reachability, steady-state, expected steps) | 199 |
 | `integration` | MPST bridge adapter (MCP/A2A session types), CSP orchestration adapter (DAG-to-CSP, workflow verification) | 52 |
 
-### Imports
-
-```python
-# Process algebra
-from agenticraft_foundation.algebra import trace_refines, failures_refines, strong_bisimilar
-
-# Session types
-from agenticraft_foundation.mpst import Projector, SessionTypeChecker, SessionMonitor
-
-# Topology
-from agenticraft_foundation.topology import NetworkGraph, LaplacianAnalysis
-from agenticraft_foundation.topology import HypergraphNetwork, HypergraphAnalysis
-
-# Protocol routing
-from agenticraft_foundation.protocols import (
-    ProtocolGraph, ProtocolAwareDijkstra,
-    ProtocolConstrainedBFS, ResilientRouter, SemanticRouter,
-)
-
-# Protocol workflows and transformers
-from agenticraft_foundation.protocols import (
-    ProtocolWorkflow, WorkflowValidator, OptimalProtocolAssigner,
-    TransformerRegistry, ComposedTransformer,
-)
-
-# Specifications
-from agenticraft_foundation.specifications import (
-    WeightedConsensusState, WeightedAgreement, WeightedQuorum,
-    BDIMapping, ContractNetMapping, JointIntentionMapping, SharedPlanMapping,
-)
-
-# Complexity
-from agenticraft_foundation.complexity import (
-    CONSENSUS_BOUNDS, GOSSIP_BOUNDS, MESH_COMMUNICATION_BOUNDS,
-    FaultModel, ComplexityClass,
-)
-
-# Verification — invariant checking
-from agenticraft_foundation.verification import (
-    InvariantRegistry, check_invariant, assert_invariant, StateTransitionMonitor,
-)
-
-# Verification — counterexamples
-from agenticraft_foundation.verification import (
-    explain_refinement_failure, explain_equivalence_failure,
-    find_minimal_counterexample, CounterexampleExplanation,
-)
-
-# Verification — CTL temporal logic
-from agenticraft_foundation.verification import (
-    model_check, Atomic, Not, And, Or, EX, EF, EG, EU, AX, AF, AG, AU,
-    check_safety, check_liveness, ModelCheckResult,
-)
-
-# Verification — probabilistic (DTMC)
-from agenticraft_foundation.verification import (
-    DTMC, check_reachability, steady_state, expected_steps, build_dtmc_from_lts,
-)
-```
-
-## Protocol Graph Model
-
-The multi-protocol mesh is modeled as **G = (V, E, P, Φ, Γ)** where:
-
-- **V** -- Agent nodes with capabilities and supported protocols
-- **E** -- Edges with protocol sets Φ(u,v) and weights
-- **P** -- Protocol universe {MCP, A2A, ANP, ...}
-- **Φ** -- Protocol assignment function E → 2ᴾ
-- **Γ** -- Protocol affinity function V × P → [0,1]
-
-### Node Types
-
-| Type | Description |
-|---|---|
-| `LLM_AGENT` | Language model agent with inference capabilities |
-| `TOOL_SERVER` | Stateless tool/function provider |
-| `COORDINATOR` | Orchestration and routing agent |
-| `GATEWAY` | Protocol translation bridge |
-
-### Routing Algorithms
-
-| Algorithm | Class | Strategy | Complexity |
-|---|---|---|---|
-| Dijkstra | `ProtocolAwareDijkstra` | Minimum-cost with protocol translation | O((V+E) log V) |
-| BFS | `ProtocolConstrainedBFS` | Minimum-hop with protocol constraints | O(V + E) |
-| Resilient | `ResilientRouter` | Failover with degraded topology | O((V+E) log V) |
-| Semantic | `SemanticRouter` | Capability similarity + affinity scoring | O(V * C) |
-
-### Protocol Transformers
-
-Composable message transformers **T: M_p → M_p' ∪ {⊥}** with classification:
-
-| Classification | Property | Example |
-|---|---|---|
-| Lossless | T⁻¹(T(m)) = m | Identity, format-only changes |
-| Lossy | T⁻¹(T(m)) ≈ m | Metadata reduction, field aggregation |
-| Destructive | T⁻¹(T(m)) may be ⊥ | Incompatible protocol families |
-
-Transformers compose: **T_{p→p''} = T_{p'→p''} ∘ T_{p→p'}**. The `TransformerRegistry` auto-composes via BFS when no direct transformer exists.
-
-## Hypergraph Topology
-
-Standard graphs model pairwise agent connections. Hypergraphs generalize this to **group coordination** where a single hyperedge connects multiple agents simultaneously.
-
-**Hypergraph Laplacian**: L_H = D_v − H W D_e⁻¹ Hᵀ
-
-- **H** -- Incidence matrix (nodes × hyperedges)
-- **W** -- Diagonal weight matrix
-- **D_v** -- Node degree matrix
-- **D_e** -- Hyperedge degree matrix
-
-The algebraic connectivity (λ₂) of the hypergraph Laplacian bounds consensus convergence time: **T = O(n log n / λ₂)**.
-
-Factory constructors:
-- `HypergraphNetwork.from_graph(edges)` -- Convert pairwise edges to 2-hyperedges
-- `HypergraphNetwork.clique_expansion(groups)` -- Build from group membership
-
-## Fault Models
-
-Classical distributed systems fault models extended with LLM-specific failure modes:
-
-| Fault Model | Description | Classical Analog |
-|---|---|---|
-| `CRASH_STOP` | Process halts permanently | -- |
-| `CRASH_RECOVERY` | Process halts and may restart | -- |
-| `BYZANTINE` | Arbitrary (including malicious) behavior | -- |
-| `OMISSION` | Fails to send or receive messages | -- |
-| `HALLUCINATION` | Generates confident but incorrect output | Byzantine (incorrect) |
-| `PROMPT_INJECTION` | External input corrupts agent behavior | Byzantine (malicious) |
-| `NON_DETERMINISM` | Same input produces different outputs | Omission (partial) |
-| `CONTEXT_OVERFLOW` | Exceeds context window, loses information | Crash-recovery |
-
-## Complexity Bounds
-
-30+ catalogued bounds across distributed algorithms:
-
-| Category | Examples |
-|---|---|
-| Consensus | Synchronous crash O(f+1) rounds, async FLP impossibility, Byzantine Θ(n²) messages |
-| Gossip | Convergence O(n log n), diameter-bounded O(D log n) |
-| Leader Election | Synchronous O(n), async Ω(n log n) |
-| Broadcast | Flooding O(n²), spanning tree O(n) |
-| Mesh Communication | Full mesh O(n) messages, tree O(n) / O(log n) rounds, ring O(n) / O(n) rounds |
-
-## Weighted Consensus
-
-Quality-weighted quorum consensus assigns weights **wᵢ** to agents based on historical reliability. A quorum requires total weight exceeding **2W/3** to guarantee:
-
-- **Weighted Agreement**: No two correct quorums decide differently
-- **Weighted Validity**: Decided values come from proposals with sufficient weight
-- **Weighted Quorum Intersection**: Any two quorums share honest-majority weight
-
-## MAS Theory Mappings
-
-Bidirectional mappings between classical multi-agent systems theory and mesh coordination:
-
-| Theory | Mapping |
-|---|---|
-| **BDI** | Beliefs → context state, Desires → task objectives, Intentions → active assignments |
-| **Joint Intentions** | Mutual belief → consensus state, persistent goal → task completion condition |
-| **SharedPlans** | Recipe → task decomposition DAG, subgroup plans → agent cluster assignments |
-| **Contract Net** | Manager broadcasts CFP → bidders respond → manager awards → execution reports |
-
-Each mapping preserves formal properties bidirectionally via `verify_mapping_preservation()`.
-
-## Project Structure
-
-```
-src/agenticraft_foundation/
-    algebra/           # CSP process algebra (8 files)
-    mpst/              # Multiparty Session Types (7 files)
-    topology/          # Network + hypergraph topology (4 files)
-    protocols/         # Multi-protocol mesh model (10 files)
-    specifications/    # Formal consensus + MAS specs (3 files)
-    complexity/        # Bounds + fault models (2 files)
-    verification/      # Invariant checking, counterexamples, CTL, DTMC (4 files)
-    integration/       # Bridge adapters (2 files)
-    types.py           # Shared type definitions
-tests/                 # 1165 tests across 33 test modules
-```
+See the docs for: [Protocol Graph Model](https://agenticraft.github.io/agenticraft-foundation/concepts/protocol-graph/) | [Verification Pipeline](https://agenticraft.github.io/agenticraft-foundation/concepts/verification/) | [Spectral Topology](https://agenticraft.github.io/agenticraft-foundation/concepts/spectral-topology/) | [Fault Models & Complexity](https://agenticraft.github.io/agenticraft-foundation/concepts/complexity/) | [Consensus & MAS Mappings](https://agenticraft.github.io/agenticraft-foundation/concepts/consensus/) | [Full API Reference](https://agenticraft.github.io/agenticraft-foundation/api/)
 
 ## Development
 
@@ -703,16 +247,12 @@ Multi-agent systems fail in production because coordination bugs are invisible u
 ## References
 
 - Hoare, C.A.R. (1985). *Communicating Sequential Processes*. Prentice Hall.
-- Milner, R. (1980). *A Calculus of Communicating Systems*. Springer.
 - Roscoe, A.W. (1998). *The Theory and Practice of Concurrency*. Prentice Hall.
 - Clarke, E.M., Emerson, E.A. (1981). Design and Synthesis of Synchronization Skeletons Using Branching Time Temporal Logic. *Workshop on Logics of Programs*.
 - Baier, C., Katoen, J.-P. (2008). *Principles of Model Checking*. MIT Press.
-- Hansson, H., Jonsson, B. (1994). A Logic for Reasoning about Time and Reliability. *Formal Aspects of Computing*.
 - Honda, K., Yoshida, N., Carbone, M. (2016). Multiparty Asynchronous Session Types. *JACM*.
-- Fischer, M.J., Lynch, N.A., Paterson, M.S. (1985). Impossibility of Distributed Consensus with One Faulty Process. *JACM*.
-- Castro, M., Liskov, B. (1999). Practical Byzantine Fault Tolerance. *OSDI*.
-- Rao, A.S., Georgeff, M.P. (1995). BDI Agents: From Theory to Practice. *ICMAS*.
-- Smith, R.G. (1980). The Contract Net Protocol. *IEEE Transactions on Computers*.
+
+See the [full references](https://agenticraft.github.io/agenticraft-foundation/changelog/) in the documentation.
 
 ## Citation
 

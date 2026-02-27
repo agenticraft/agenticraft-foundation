@@ -286,6 +286,242 @@ class TestDAGConversion:
         # Empty DAG is SKIP
         assert is_deadlock_free(process)
 
+    def test_workflow_to_process_with_from_to_edges(self, csp_adapter):
+        """Test DAG with 'from'/'to' edge format."""
+        dag = {
+            "nodes": {
+                "a": {"type": "task"},
+                "b": {"type": "task"},
+            },
+            "edges": [
+                {"from": "a", "to": "b"},
+            ],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+        assert is_deadlock_free(process)
+
+    def test_workflow_to_process_unknown_node_type(self, csp_adapter):
+        """Test DAG with unknown node type falls back to TASK."""
+        dag = {
+            "nodes": {
+                "x": {"type": "unknown_type"},
+            },
+            "edges": [],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+
+    def test_workflow_to_process_parallel_node(self, csp_adapter):
+        """Test DAG with parallel node type."""
+        dag = {
+            "nodes": {
+                "fork": {"type": "parallel"},
+                "a": {"type": "task"},
+                "b": {"type": "task"},
+            },
+            "edges": [
+                {"source": "fork", "target": "a"},
+                {"source": "fork", "target": "b"},
+            ],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+
+    def test_workflow_to_process_choice_node(self, csp_adapter):
+        """Test DAG with choice node type."""
+        dag = {
+            "nodes": {
+                "branch": {"type": "choice"},
+                "a": {"type": "task"},
+                "b": {"type": "task"},
+            },
+            "edges": [
+                {"source": "branch", "target": "a"},
+                {"source": "branch", "target": "b"},
+            ],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+
+    def test_workflow_to_process_sequence_node(self, csp_adapter):
+        """Test DAG with sequence node type."""
+        dag = {
+            "nodes": {
+                "seq": {"type": "sequence"},
+                "a": {"type": "task"},
+            },
+            "edges": [
+                {"source": "seq", "target": "a"},
+            ],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+
+    def test_workflow_to_process_multiple_roots(self, csp_adapter):
+        """Test DAG with multiple root nodes."""
+        dag = {
+            "nodes": {
+                "root1": {"type": "task"},
+                "root2": {"type": "task"},
+            },
+            "edges": [],
+        }
+        process = csp_adapter.workflow_to_process(dag)
+        assert process is not None
+
+
+class TestWorkflowSpecEdgeCases:
+    """Tests for edge cases in WorkflowSpec constructors."""
+
+    def test_parallel_tasks_empty(self):
+        """Test parallel workflow with empty task list."""
+        spec = WorkflowSpec.parallel_tasks("empty_par", [])
+        assert spec.name == "empty_par"
+        assert is_deadlock_free(spec.process)
+
+    def test_choice_tasks_empty(self):
+        """Test choice workflow with empty task list."""
+        spec = WorkflowSpec.choice_tasks("empty_choice", [])
+        assert spec.name == "empty_choice"
+        assert is_deadlock_free(spec.process)
+
+
+class TestVerifySpecExtended:
+    """Extended tests for verify_spec with invariants and deadlocks."""
+
+    def test_verify_spec_with_passing_invariant(self, csp_adapter):
+        """Test verify_spec with a passing custom invariant."""
+        spec = WorkflowSpec(
+            name="invariant_pass",
+            process=prefix("a", skip()),
+            invariants=[lambda p: True],
+        )
+        result = csp_adapter.verify_spec(spec)
+        assert result.is_valid
+
+    def test_verify_spec_with_failing_invariant(self, csp_adapter):
+        """Test verify_spec with a failing custom invariant."""
+        spec = WorkflowSpec(
+            name="invariant_fail",
+            process=prefix("a", skip()),
+            invariants=[lambda p: False],
+        )
+        result = csp_adapter.verify_spec(spec)
+        assert not result.is_valid
+        assert any("invariant" in v.lower() for v in result.violations)
+
+    def test_verify_spec_with_exception_invariant(self, csp_adapter):
+        """Test verify_spec with an invariant that raises."""
+
+        def bad_invariant(p):
+            raise RuntimeError("test error")
+
+        spec = WorkflowSpec(
+            name="invariant_error",
+            process=prefix("a", skip()),
+            invariants=[bad_invariant],
+        )
+        result = csp_adapter.verify_spec(spec)
+        assert not result.is_valid
+        assert any("exception" in v.lower() for v in result.violations)
+
+    def test_verify_spec_deadlock_detected(self, csp_adapter):
+        """Test verify_spec detects deadlock."""
+        spec = WorkflowSpec(
+            name="deadlock_spec",
+            process=choice(prefix("a", stop()), prefix("b", skip())),
+            events_of_interest=frozenset({Event("a"), Event("b")}),
+        )
+        result = csp_adapter.verify_spec(spec)
+        assert not result.is_valid
+        assert not result.is_deadlock_free
+
+
+class TestVerifyWorkflowExtended:
+    """Extended tests for verify_workflow with different modes."""
+
+    def test_verify_workflow_failures_mode(self, csp_adapter, simple_workflow):
+        """Test verify_workflow with failures refinement mode."""
+        csp_adapter.register_spec(simple_workflow)
+        impl = sequential(
+            prefix("task1", skip()),
+            sequential(prefix("task2", skip()), prefix("task3", skip())),
+        )
+        result = csp_adapter.verify_workflow("simple_workflow", impl, mode="failures")
+        assert result is not None
+
+    def test_verify_workflow_fd_mode(self, csp_adapter, simple_workflow):
+        """Test verify_workflow with fd refinement mode."""
+        csp_adapter.register_spec(simple_workflow)
+        impl = sequential(
+            prefix("task1", skip()),
+            sequential(prefix("task2", skip()), prefix("task3", skip())),
+        )
+        result = csp_adapter.verify_workflow("simple_workflow", impl, mode="fd")
+        assert result is not None
+
+    def test_verify_workflow_unknown_mode(self, csp_adapter, simple_workflow):
+        """Test verify_workflow with unknown refinement mode."""
+        csp_adapter.register_spec(simple_workflow)
+        impl = prefix("a", skip())
+        result = csp_adapter.verify_workflow("simple_workflow", impl, mode="invalid")
+        assert not result.is_valid
+        assert any("Unknown" in v for v in result.violations)
+
+    def test_register_and_verify_implementation(self, csp_adapter, simple_workflow):
+        """Test register_implementation and verify without explicit impl."""
+        csp_adapter.register_spec(simple_workflow)
+        impl = sequential(
+            prefix("task1", skip()),
+            sequential(prefix("task2", skip()), prefix("task3", skip())),
+        )
+        csp_adapter.register_implementation("simple_workflow", impl)
+        result = csp_adapter.verify_workflow("simple_workflow")
+        assert result is not None
+
+
+class TestComposeWorkflowsExtended:
+    """Extended tests for compose_workflows."""
+
+    def test_compose_choice(self, csp_adapter):
+        """Test choice composition of workflows."""
+        spec1 = WorkflowSpec.sequential_tasks("wf1", ["a"])
+        spec2 = WorkflowSpec.sequential_tasks("wf2", ["b"])
+
+        csp_adapter.register_spec(spec1)
+        csp_adapter.register_spec(spec2)
+
+        composed = csp_adapter.compose_workflows(
+            "composed_choice",
+            ["wf1", "wf2"],
+            composition_type="choice",
+        )
+        assert composed is not None
+        assert Event("a") in composed.events_of_interest
+        assert Event("b") in composed.events_of_interest
+
+    def test_compose_unknown_type(self, csp_adapter):
+        """Test compose with unknown composition type returns None."""
+        spec1 = WorkflowSpec.sequential_tasks("wf1", ["a"])
+        csp_adapter.register_spec(spec1)
+
+        composed = csp_adapter.compose_workflows(
+            "bad",
+            ["wf1"],
+            composition_type="invalid",
+        )
+        assert composed is None
+
+    def test_compose_empty_list(self, csp_adapter):
+        """Test compose with empty workflow list."""
+        composed = csp_adapter.compose_workflows(
+            "empty",
+            [],
+            composition_type="parallel",
+        )
+        assert composed is not None
+
 
 class TestWorkflowVerificationResult:
     """Tests for WorkflowVerificationResult."""

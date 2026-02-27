@@ -229,51 +229,45 @@ class HypergraphNetwork:
         Returns:
             (node_ids, Laplacian matrix)
         """
+        import numpy as np
+
         node_ids, edge_ids, h_mat = self.incidence_matrix()
         n = len(node_ids)
-        m = len(edge_ids)
 
         if n == 0:
             return [], []
 
-        # D_e: diagonal hyperedge degree (number of nodes in each edge)
-        de_inv = []
-        for eid in edge_ids:
-            degree = self._hyperedges[eid].degree
-            de_inv.append(1.0 / degree if degree > 0 else 0.0)
+        # Convert to numpy for efficient matrix operations
+        h_arr = np.array(h_mat, dtype=np.float64)  # n × m
 
-        # W: diagonal weight matrix
-        w = [self._hyperedges[eid].weight for eid in edge_ids]
+        # D_e^{-1}: inverse hyperedge degree
+        de_inv = np.array(
+            [
+                1.0 / self._hyperedges[eid].degree if self._hyperedges[eid].degree > 0 else 0.0
+                for eid in edge_ids
+            ],
+            dtype=np.float64,
+        )
 
-        # Compute H * W * D_e^{-1} * H^T
-        # First: M = W * D_e^{-1} (diagonal)
-        m_diag = [w[j] * de_inv[j] for j in range(m)]
+        # W: hyperedge weights
+        w = np.array(
+            [self._hyperedges[eid].weight for eid in edge_ids],
+            dtype=np.float64,
+        )
 
-        # Then: result = H * diag(m_diag) * H^T
-        hwdh = [[0.0] * n for _ in range(n)]
-        for i in range(n):
-            for k in range(n):
-                val = 0.0
-                for j in range(m):
-                    val += h_mat[i][j] * m_diag[j] * h_mat[k][j]
-                hwdh[i][k] = val
+        # M = W * D_e^{-1} (element-wise, diagonal)
+        m_diag = w * de_inv
 
-        # D_v: weighted node degree
-        dv = [0.0] * n
-        for i in range(n):
-            for j in range(m):
-                dv[i] += h_mat[i][j] * w[j]
+        # H W D_e^{-1} H^T via numpy: (H * m_diag) @ H^T
+        hwdh = (h_arr * m_diag) @ h_arr.T
 
-        # lap = D_v - H W D_e^{-1} H^T
-        lap = [[0.0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                if i == j:
-                    lap[i][j] = dv[i] - hwdh[i][j]
-                else:
-                    lap[i][j] = -hwdh[i][j]
+        # D_v: weighted node degree = H @ w
+        dv = h_arr @ w
 
-        return node_ids, lap
+        # L = D_v - H W D_e^{-1} H^T
+        lap_arr = np.diag(dv) - hwdh
+
+        return node_ids, lap_arr.tolist()
 
     def analyze(self) -> HypergraphAnalysis:
         """Perform spectral analysis of the hypergraph.
@@ -344,101 +338,29 @@ class HypergraphNetwork:
         self,
         matrix: list[list[float]],
         n: int,
-        num_iterations: int = 100,
     ) -> list[float]:
-        """Compute eigenvalues using QR-like iteration (simplified).
+        """Compute eigenvalues of the hypergraph Laplacian.
 
-        Pure Python implementation — no numpy dependency.
+        Uses numpy's eigh() for exact eigenvalue computation
+        of the symmetric Laplacian matrix.
+
+        Args:
+            matrix: Square symmetric Laplacian matrix
+            n: Matrix dimension
+
+        Returns:
+            List of eigenvalues in ascending order
         """
+        import numpy as np
+
         if n == 0:
             return []
         if n == 1:
             return [matrix[0][0]]
-        if n == 2:
-            # Direct formula for 2x2
-            a, b = matrix[0][0], matrix[0][1]
-            c, d = matrix[1][0], matrix[1][1]
-            trace = a + d
-            det = a * d - b * c
-            disc = trace * trace - 4 * det
-            if disc < 0:
-                disc = 0.0
-            sqrt_disc = math.sqrt(disc)
-            return [(trace - sqrt_disc) / 2, (trace + sqrt_disc) / 2]
 
-        # For larger matrices, use power iteration to find eigenvalues
-        # This is a simplified approach; for production use numpy
-        eigenvalues = []
-
-        # Gershgorin circle theorem: each eigenvalue lies in at least one
-        # disc D(center_i, radius_i) where center = a_ii, radius = Σ|a_ij|
-        gershgorin_discs = []
-        for i in range(n):
-            center = matrix[i][i]
-            radius = sum(abs(matrix[i][j]) for j in range(n) if j != i)
-            gershgorin_discs.append((center, radius))
-            eigenvalues.append(center)
-
-        # For the Laplacian, we know λ₁ = 0
-        eigenvalues[0] = 0.0
-
-        # Power iteration for largest eigenvalue
-        v = [math.sin((i + 1) * math.pi / (n + 1)) for i in range(n)]
-        norm = math.sqrt(sum(x * x for x in v))
-        if norm > 0:
-            v = [x / norm for x in v]
-
-        eigenvalue = eigenvalues[-1] if eigenvalues else 0.0
-        for _ in range(num_iterations):
-            # w = L * v
-            w = [sum(matrix[i][j] * v[j] for j in range(n)) for i in range(n)]
-            # Rayleigh quotient
-            eigenvalue = sum(w[i] * v[i] for i in range(n))
-            norm = math.sqrt(sum(x * x for x in w))
-            if norm > 1e-15:
-                v = [x / norm for x in w]
-            else:
-                break
-
-        if len(eigenvalues) > 0:
-            eigenvalues[-1] = eigenvalue
-
-        # For λ₂, use deflated power iteration
-        if n >= 2:
-            # Remove component along eigenvector of λ₁ (constant vector)
-            ones = [1.0 / math.sqrt(n)] * n
-            v2 = [math.sin((i + 1) * 2 * math.pi / (n + 1)) for i in range(n)]
-            # Orthogonalize against ones
-            dot = sum(v2[i] * ones[i] for i in range(n))
-            v2 = [v2[i] - dot * ones[i] for i in range(n)]
-            norm = math.sqrt(sum(x * x for x in v2))
-            if norm > 1e-15:
-                v2 = [x / norm for x in v2]
-
-            lambda2 = eigenvalues[1] if len(eigenvalues) > 1 else 0.0
-            for _ in range(num_iterations):
-                w = [sum(matrix[i][j] * v2[j] for j in range(n)) for i in range(n)]
-                # Remove projection onto ones
-                dot = sum(w[i] * ones[i] for i in range(n))
-                w = [w[i] - dot * ones[i] for i in range(n)]
-                lambda2 = sum(w[i] * v2[i] for i in range(n))
-                norm = math.sqrt(sum(x * x for x in w))
-                if norm > 1e-15:
-                    v2 = [x / norm for x in w]
-                else:
-                    break
-
-            if len(eigenvalues) > 1:
-                eigenvalues[1] = lambda2
-
-        # Clamp eigenvalues to Gershgorin bounds: λ ∈ [c - r, c + r]
-        # for at least one disc — use the union of all discs
-        if gershgorin_discs:
-            g_min = min(c - r for c, r in gershgorin_discs)
-            g_max = max(c + r for c, r in gershgorin_discs)
-            eigenvalues = [max(g_min, min(g_max, ev)) for ev in eigenvalues]
-
-        return sorted(eigenvalues)
+        arr = np.array(matrix, dtype=np.float64)
+        eigenvalues = np.linalg.eigh(arr)[0]
+        return sorted(eigenvalues.tolist())
 
     @classmethod
     def from_graph(

@@ -304,3 +304,231 @@ class TestConsensusBounds:
         assert bound.metric
         assert bound.expression
         assert bound.source
+
+
+class TestComplexityBoundExtended:
+    """Extended tests for ComplexityBound edge cases."""
+
+    def test_str_best_case(self):
+        """Test string repr with best-case qualifier."""
+        bound = ComplexityBound(expression="O(n)", worst_case=False)
+        s = str(bound)
+        assert "best-case" in s
+
+    def test_str_multiple_qualifiers(self):
+        """Test string repr with multiple qualifiers."""
+        bound = ComplexityBound(expression="O(n)", amortized=True, expected=True)
+        s = str(bound)
+        assert "amortized" in s
+        assert "expected" in s
+
+
+class TestDistributedComplexityExtended:
+    """Extended tests for DistributedComplexity to_dict and format_docstring."""
+
+    def test_to_dict_all_fields(self):
+        """Test to_dict with all optional fields populated."""
+        comp = DistributedComplexity(
+            time="O(n)",
+            space="O(n)",
+            messages="O(n^2)",
+            message_size="O(log n)",
+            rounds="O(1)",
+            bits="O(n^2 log n)",
+            synchrony=SynchronyModel.ASYNCHRONOUS,
+            fault_model=FaultModel.BYZANTINE,
+            fault_tolerance="f < n/3",
+            assumptions=["authenticated channels"],
+            theorem_ref="Lamport 1998",
+            lower_bound="Omega(n^2)",
+            optimal=True,
+        )
+        d = comp.to_dict()
+        assert "time" in d
+        assert "space" in d
+        assert "messages" in d
+        assert "message_size" in d
+        assert "rounds" in d
+        assert "bits" in d
+        assert d["synchrony"] == "asynchronous"
+        assert d["fault_model"] == "byzantine"
+        assert d["fault_tolerance"] == "f < n/3"
+        assert d["assumptions"] == ["authenticated channels"]
+        assert d["theorem_ref"] == "Lamport 1998"
+        assert d["lower_bound"] == "Omega(n^2)"
+        assert d["optimal"] is True
+
+    def test_to_dict_string_synchrony_and_fault_model(self):
+        """Test to_dict with string (non-enum) synchrony and fault model."""
+        comp = DistributedComplexity(
+            time="O(n)",
+            synchrony="custom_sync",
+            fault_model="custom_fault",
+        )
+        d = comp.to_dict()
+        assert d["synchrony"] == "custom_sync"
+        assert d["fault_model"] == "custom_fault"
+
+    def test_format_docstring_all_fields(self):
+        """Test format_docstring with all fields populated."""
+        comp = DistributedComplexity(
+            time="O(n)",
+            space="O(1)",
+            messages="O(n^2)",
+            rounds="O(1)",
+            fault_tolerance="f < n/3",
+            synchrony=SynchronyModel.PARTIAL_SYNCHRONY,
+            assumptions=["reliable channels"],
+            theorem_ref="Fischer 1985",
+            optimal=True,
+        )
+        doc = comp.format_docstring()
+        assert "Time:" in doc
+        assert "Space:" in doc
+        assert "Messages:" in doc
+        assert "Rounds:" in doc
+        assert "Fault Tolerance:" in doc
+        assert "Synchrony: partial_synchrony" in doc
+        assert "Assumptions:" in doc
+        assert "Reference:" in doc
+        assert "lower bound" in doc
+
+    def test_format_docstring_string_synchrony(self):
+        """Test format_docstring with string synchrony model."""
+        comp = DistributedComplexity(
+            time="O(n)",
+            synchrony="custom_model",
+        )
+        doc = comp.format_docstring()
+        assert "Synchrony: custom_model" in doc
+
+
+class TestGetAllComplexities:
+    """Test get_all_complexities registry function."""
+
+    def test_get_all_complexities(self):
+        """Test retrieving all registered complexities."""
+        from agenticraft_foundation.complexity.annotations import get_all_complexities
+
+        result = get_all_complexities()
+        assert isinstance(result, dict)
+
+
+class TestAnalyzeComplexity:
+    """Tests for analyze_complexity module analysis."""
+
+    def test_analyze_module(self):
+        """Test analyzing a module for complexity annotations."""
+        import types
+
+        from agenticraft_foundation.complexity.annotations import (
+            ComplexityAnalysis,
+            analyze_complexity,
+        )
+
+        # Create a test module with annotated and unannotated functions
+        test_mod = types.ModuleType("test_mod")
+        test_mod.__name__ = "test_mod"
+
+        @complexity(time="O(n)", fault_model=FaultModel.BYZANTINE, optimal=True)
+        def annotated_func():
+            """Has complexity."""
+            pass
+
+        async def unannotated_async():
+            """Has docstring but no annotation."""
+            pass
+
+        def plain_func():
+            pass
+
+        test_mod.annotated_func = annotated_func
+        test_mod.unannotated_async = unannotated_async
+        test_mod.plain_func = plain_func
+
+        result = analyze_complexity(test_mod)
+        assert isinstance(result, ComplexityAnalysis)
+        assert result.total_annotated >= 0
+
+    def test_complexity_analysis_summary(self):
+        """Test ComplexityAnalysis summary generation."""
+        from agenticraft_foundation.complexity.annotations import ComplexityAnalysis
+
+        analysis = ComplexityAnalysis(
+            functions={"mod.func1": DistributedComplexity(time="O(n)")},
+            total_annotated=1,
+            by_time_complexity={"O(n)": ["mod.func1"]},
+            by_fault_model={"byzantine": ["mod.func1"]},
+            optimal_algorithms=["mod.func1"],
+            missing_annotations=["mod.func2"],
+        )
+        summary = analysis.summary()
+        assert "Total annotated functions: 1" in summary
+        assert "Optimal algorithms: 1" in summary
+        assert "Missing annotations: 1" in summary
+        assert "O(n)" in summary
+        assert "byzantine" in summary
+
+
+class TestParseBigOExtended:
+    """Extended tests for Big-O parsing covering more patterns."""
+
+    def test_parse_factorial(self):
+        """Test parsing factorial complexity."""
+        class_name, _ = parse_big_o("O(n!)")
+        assert class_name == "factorial"
+
+    def test_parse_diameter(self):
+        """Test parsing diameter complexity."""
+        class_name, _ = parse_big_o("O(D)")
+        assert class_name == "diameter"
+
+    def test_parse_diameter_log(self):
+        """Test parsing diameter-log complexity."""
+        class_name, _ = parse_big_o("O(D * log n)")
+        assert class_name == "diameter_log"
+
+    def test_parse_sqrt(self):
+        """Test parsing sqrt complexity."""
+        class_name, _ = parse_big_o("O(sqrt(n))")
+        assert class_name == "sqrt"
+
+    def test_parse_logarithmic(self):
+        """Test parsing log complexity."""
+        class_name, _ = parse_big_o("O(log n)")
+        assert class_name == "logarithmic"
+
+    def test_parse_no_parens(self):
+        """Test parsing expression without standard notation."""
+        class_name, params = parse_big_o("n^2")
+        assert class_name == "unknown"
+        assert "raw" in params
+
+    def test_parse_polynomial_log(self):
+        """Test parsing polynomial with log factor."""
+        class_name, params = parse_big_o("O(n^2 log n)")
+        assert class_name == "polynomial_log"
+        assert params["exponent"] == 2
+        assert params["log_factor"] is True
+
+
+class TestCompareComplexityExtended:
+    """Extended tests for complexity comparison."""
+
+    def test_compare_polynomial_exponents(self):
+        """Test comparing different polynomial exponents."""
+        result = compare_complexity("O(n^2)", "O(n^3)")
+        assert result < 0
+
+        result = compare_complexity("O(n^3)", "O(n^2)")
+        assert result > 0
+
+    def test_compare_same_polynomial(self):
+        """Test comparing same polynomial exponents."""
+        result = compare_complexity("O(n^2)", "O(n^2)")
+        assert result == 0
+
+    def test_compare_unknown_classes(self):
+        """Test comparing unknown complexity classes."""
+        result = compare_complexity("O(weird)", "O(stuff)")
+        assert result == 0

@@ -25,7 +25,7 @@ This should print the installed version (e.g., `0.1.0`).
 ## Requirements
 
 - **Python 3.10+**
-- **Zero runtime dependencies** -- the library uses only the Python standard library. No NumPy, no SciPy, no external packages.
+- **Minimal runtime dependencies** -- requires only NumPy for spectral analysis and probabilistic verification. Core CSP, MPST, and protocol modules are pure Python.
 
 ## Development setup
 
@@ -43,4 +43,4 @@ uv sync --group dev
 uv run pytest tests/ -v
 ```
 
-The full test suite (1,012 tests) should complete in under a minute on most machines. All tests run without network access or external services.
+The full test suite (1,300+ tests) should complete in under a minute on most machines. All tests run without network access or external services.

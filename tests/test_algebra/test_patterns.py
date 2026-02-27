@@ -286,3 +286,153 @@ class TestVerifyPattern:
         pattern = PipelinePattern(stages=["a", "b", "c"])
         result = verify_pattern(pattern)
         assert result.is_deadlock_free
+
+
+class TestPatternCompose:
+    """Tests for CoordinationPattern.compose()."""
+
+    def test_request_response_compose(self):
+        """Test composing request-response local processes."""
+        pattern = RequestResponsePattern()
+        composed = pattern.compose()
+        assert Event("request") in composed.initials()
+
+    def test_pipeline_compose(self):
+        """Test composing pipeline local processes produces a process."""
+        pattern = PipelinePattern(stages=["a", "b", "c"])
+        composed = pattern.compose()
+        # Composed process is valid (may deadlock due to sync semantics)
+        assert composed is not None
+
+    def test_scatter_gather_compose(self):
+        """Test composing scatter-gather local processes produces a process."""
+        pattern = ScatterGatherPattern(workers=["w1", "w2"])
+        composed = pattern.compose()
+        assert composed is not None
+
+    def test_compose_with_custom_sync(self):
+        """Test compose with custom sync events."""
+        pattern = RequestResponsePattern()
+        composed = pattern.compose(sync_events={"request"})
+        assert Event("request") in composed.initials()
+
+
+class TestRepeatablePatterns:
+    """Tests for repeatable=True branches in all patterns."""
+
+    def test_request_response_repeatable_local_client(self):
+        """Test repeatable client local process."""
+        pattern = RequestResponsePattern(repeatable=True)
+        client = pattern.local_process("client")
+        assert Event("request") in client.initials()
+
+    def test_request_response_repeatable_local_server(self):
+        """Test repeatable server local process."""
+        pattern = RequestResponsePattern(repeatable=True)
+        server = pattern.local_process("server")
+        assert Event("request") in server.initials()
+
+    def test_pipeline_repeatable_global(self):
+        """Test repeatable pipeline global process."""
+        p = pipeline(["a", "b", "c"], repeatable=True)
+        assert Event("data_a_b") in p.initials()
+
+    def test_pipeline_repeatable_local(self):
+        """Test repeatable pipeline local process."""
+        pattern = PipelinePattern(stages=["a", "b", "c"], repeatable=True)
+        b_local = pattern.local_process("b")
+        assert Event("data_a_b") in b_local.initials()
+
+    def test_scatter_gather_repeatable_global(self):
+        """Test repeatable scatter-gather global process."""
+        p = scatter_gather(workers=["w1", "w2"], repeatable=True)
+        assert Event("task_w1") in p.initials()
+
+    def test_scatter_gather_repeatable_worker(self):
+        """Test repeatable scatter-gather worker local process."""
+        pattern = ScatterGatherPattern(workers=["w1", "w2"], repeatable=True)
+        w = pattern.local_process("w1")
+        assert Event("task_w1") in w.initials()
+
+    def test_barrier_repeatable_global(self):
+        """Test repeatable barrier global process."""
+        p = barrier(["p1", "p2"], repeatable=True)
+        assert Event("arrive_p1") in p.initials()
+
+    def test_barrier_repeatable_local(self):
+        """Test repeatable barrier local process."""
+        pattern = BarrierPattern(participants_list=["p1", "p2"], repeatable=True)
+        local = pattern.local_process("p1")
+        assert Event("arrive_p1") in local.initials()
+
+
+class TestUnknownParticipantErrors:
+    """Tests for ValueError on unknown participants."""
+
+    def test_request_response_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = RequestResponsePattern()
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+    def test_pipeline_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = PipelinePattern(stages=["a", "b"])
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+    def test_scatter_gather_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = ScatterGatherPattern(workers=["w1"])
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+    def test_barrier_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = BarrierPattern(participants_list=["p1"])
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+    def test_mutex_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = MutexPattern(processes=["p1"])
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+    def test_producer_consumer_unknown(self):
+        """Test unknown participant raises ValueError."""
+        pattern = ProducerConsumerPattern()
+        with pytest.raises(ValueError, match="Unknown participant"):
+            pattern.local_process("unknown")
+
+
+class TestMutexSystemProcess:
+    """Tests for MutexPattern.system_process()."""
+
+    def test_system_process_creation(self):
+        """Test mutex system process composes mutex with all participants."""
+        pattern = MutexPattern(processes=["p1", "p2"])
+        system = pattern.system_process()
+        assert Event("acquire") in system.initials()
+
+    def test_system_process_single(self):
+        """Test mutex system process with single participant."""
+        pattern = MutexPattern(processes=["p1"])
+        system = pattern.system_process()
+        assert Event("acquire") in system.initials()
+
+
+class TestPipelineEdgeCases:
+    """Tests for pipeline edge cases."""
+
+    def test_pipeline_first_stage_local(self):
+        """Test first stage only sends, doesn't receive."""
+        pattern = PipelinePattern(stages=["a", "b", "c"])
+        a_local = pattern.local_process("a")
+        assert Event("data_a_b") in a_local.initials()
+
+    def test_pipeline_last_stage_local(self):
+        """Test last stage only receives, doesn't send."""
+        pattern = PipelinePattern(stages=["a", "b", "c"])
+        c_local = pattern.local_process("c")
+        assert Event("data_b_c") in c_local.initials()

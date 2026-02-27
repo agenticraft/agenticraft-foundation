@@ -61,6 +61,10 @@ class Interrupt(Process):
     P triangle Q means: execute P, but if any event in Q's initial
     alphabet occurs, abandon P and continue with Q.after(event).
 
+    Note: This is a CSP extension for agent coordination, not part of
+    the standard CSP algebra (Hoare 1985). Based on Roscoe's interrupt
+    (§5.3) but simplified for agent preemption.
+
     Agent use case: An agent processing a long task (P) gets
     interrupted by a higher-priority request (Q). The interrupt
     triggers on any event in Q's initial set.
@@ -106,6 +110,9 @@ class Interrupt(Process):
         else:
             raise ValueError(f"Event {event!r} not in alphabet of {self!r}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Interrupt", self.primary._state_key(), self.handler._state_key())
+
     def __repr__(self) -> str:
         return f"({self.primary!r} \u25b3 {self.handler!r})"
 
@@ -130,6 +137,10 @@ class Timeout(Process):
     In the formal model, duration is an abstract positive value for
     ordering and composition. The tau_timeout event models expiry.
     At runtime, the orchestrator maps duration to wall-clock time.
+
+    Note: This is a CSP extension. The τ_timeout sentinel event is
+    not part of standard CSP; it models abstract time bounds for
+    agent orchestration.
 
     Agent use case: LLM call with bounded execution -- if no response
     within timeout, activate fallback (retry, cached response, escalate).
@@ -175,6 +186,9 @@ class Timeout(Process):
         else:
             raise ValueError(f"Event {event!r} not in alphabet of {self!r}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Timeout", self.process._state_key(), self.duration, self.fallback._state_key())
+
     def __repr__(self) -> str:
         return f"Timeout({self.process!r}, {self.duration}, {self.fallback!r})"
 
@@ -192,6 +206,10 @@ class Guard(Process):
 
     The condition is a callable evaluated at query time (alphabet,
     initials, after). For static guards, pass a lambda.
+
+    Note: This is a CSP extension. Standard CSP uses boolean guards
+    in replicated operators; this operator extends that to
+    runtime-evaluated conditions for agent activation.
 
     Agent use case: Only activate expensive agent if budget remains,
     safety checks pass, or load is below threshold.
@@ -232,6 +250,9 @@ class Guard(Process):
         if event in active.initials():
             return active.after(event)
         raise ValueError(f"Event {event!r} not in initials of {self!r}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Guard", id(self.condition), self.process._state_key())
 
     def __repr__(self) -> str:
         return f"Guard(<condition>, {self.process!r})"
@@ -303,6 +324,9 @@ class Rename(Process):
                 mapping=self.mapping,
             )
         raise ValueError(f"Event {event!r} not in initials of {self!r}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Rename", self.process._state_key(), tuple(sorted(self.mapping)))
 
     def __repr__(self) -> str:
         mapping_str = ", ".join(f"{k}<-{v}" for k, v in self.mapping)
@@ -396,6 +420,9 @@ class Pipe(Process):
             )
 
         raise ValueError(f"Event {event!r} not in initials of {self!r}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Pipe", self.producer._state_key(), self.consumer._state_key(), self.channel)
 
     def __repr__(self) -> str:
         ch = ", ".join(str(e) for e in sorted(self.channel))

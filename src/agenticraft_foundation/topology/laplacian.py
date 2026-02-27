@@ -289,135 +289,55 @@ class NetworkGraph:
     def _compute_eigenvalues_simple(
         self,
         matrix: list[list[float]],
-        max_iter: int = 1000,
-        tol: float = 1e-10,
     ) -> list[float]:
-        """Compute eigenvalues using power iteration.
+        """Compute eigenvalues of a symmetric matrix.
 
-        This is a simplified implementation. For production, use numpy.
+        Uses numpy's eigh() for symmetric/Hermitian matrices,
+        which returns all eigenvalues in ascending order.
 
         Args:
-            matrix: Square matrix
-            max_iter: Maximum iterations
-            tol: Convergence tolerance
+            matrix: Square symmetric matrix
 
         Returns:
             List of eigenvalues in ascending order
         """
+        import numpy as np
+
         n = len(matrix)
         if n == 0:
             return []
 
-        eigenvalues: list[float] = []
-
-        # Use deflation to find all eigenvalues
-        current_matrix = [row[:] for row in matrix]  # Deep copy
-
-        for k in range(n):
-            # Power iteration for largest eigenvalue
-            # Use non-constant initial vector to avoid getting stuck in the
-            # null space of Laplacian matrices (where [1,...,1] is always
-            # an eigenvector for eigenvalue 0).
-            x = [math.sin((i + 1) * (k + 1) * math.pi / (n + 1)) for i in range(n)]
-            norm = math.sqrt(sum(xi * xi for xi in x))
-            if norm > tol:
-                x = [xi / norm for xi in x]
-            else:
-                x = [1.0 / math.sqrt(n)] * n
-
-            prev_eigenvalue = 0.0
-            for _ in range(max_iter):
-                # Matrix-vector multiply
-                y = [sum(current_matrix[i][j] * x[j] for j in range(n)) for i in range(n)]
-
-                # Compute Rayleigh quotient
-                eigenvalue = sum(y[i] * x[i] for i in range(n))
-
-                # Normalize
-                norm = math.sqrt(sum(yi * yi for yi in y))
-                if norm < tol:
-                    eigenvalue = 0.0
-                    break
-
-                x = [yi / norm for yi in y]
-
-                if abs(eigenvalue - prev_eigenvalue) < tol:
-                    break
-                prev_eigenvalue = eigenvalue
-
-            eigenvalues.append(eigenvalue)
-
-            # Deflation: remove contribution of found eigenvalue
-            for i in range(n):
-                for j in range(n):
-                    current_matrix[i][j] -= eigenvalue * x[i] * x[j]
-
-        return sorted(eigenvalues)
+        arr = np.array(matrix, dtype=np.float64)
+        eigenvalues = np.linalg.eigh(arr)[0]
+        return sorted(eigenvalues.tolist())
 
     def _compute_fiedler_vector(
         self,
         laplacian: list[list[float]],
         node_ids: list[str],
-        max_iter: int = 1000,
-        tol: float = 1e-10,
     ) -> dict[str, float]:
         """Compute Fiedler vector (eigenvector for λ₂).
 
-        Uses inverse power iteration with shift.
+        The Fiedler vector is the eigenvector corresponding to the
+        second smallest eigenvalue of the Laplacian.
 
         Args:
             laplacian: Laplacian matrix
             node_ids: Node IDs corresponding to matrix indices
-            max_iter: Maximum iterations
-            tol: Convergence tolerance
 
         Returns:
             Dictionary mapping node ID to Fiedler vector component
         """
+        import numpy as np
+
         n = len(laplacian)
         if n < 2:
             return {node_ids[0]: 0.0} if n == 1 else {}
 
-        # Start with random vector orthogonal to all-ones
-        x = [1.0 / math.sqrt(n) if i % 2 == 0 else -1.0 / math.sqrt(n) for i in range(n)]
-
-        # Orthogonalize against constant vector
-        avg = sum(x) / n
-        x = [xi - avg for xi in x]
-        norm = math.sqrt(sum(xi * xi for xi in x))
-        if norm > tol:
-            x = [xi / norm for xi in x]
-
-        # Power iteration on (L + shift*I)^-1 to find smallest non-zero eigenvalue
-        # Use inverse iteration with shift near zero
-        shift = 0.01
-
-        for _ in range(max_iter):
-            # Solve (L + shift*I) * y = x using simple Jacobi iteration
-            # This is approximate but avoids matrix inversion
-            y = x[:]
-            for _ in range(50):
-                new_y = []
-                for i in range(n):
-                    s = x[i]
-                    for j in range(n):
-                        if i != j:
-                            s -= laplacian[i][j] * y[j]
-                    diag = laplacian[i][i] + shift
-                    new_y.append(s / diag if abs(diag) > tol else 0.0)
-                y = new_y
-
-            # Orthogonalize against constant vector
-            avg = sum(y) / n
-            y = [yi - avg for yi in y]
-
-            # Normalize
-            norm = math.sqrt(sum(yi * yi for yi in y))
-            if norm < tol:
-                break
-            x = [yi / norm for yi in y]
-
-        return {node_ids[i]: x[i] for i in range(n)}
+        arr = np.array(laplacian, dtype=np.float64)
+        _, eigenvectors = np.linalg.eigh(arr)
+        fiedler = eigenvectors[:, 1]  # second column = Fiedler vector
+        return {node_ids[i]: float(fiedler[i]) for i in range(n)}
 
     def analyze(self) -> LaplacianAnalysis:
         """Perform spectral analysis on the graph.
@@ -485,10 +405,15 @@ class NetworkGraph:
         else:
             consensus_bound = float("inf")
 
-        # Diameter estimate from spectral properties
-        # D ≈ 4 * ln(n-1) / ln(λmax / λ₂) for connected graphs
-        if is_connected and lambda_max > lambda2:
-            diameter_estimate = 4 * math.log(n - 1) / math.log(lambda_max / lambda2)
+        # Diameter upper bound from Chung (1997, Theorem 1.1):
+        # D ≤ ⌈cosh⁻¹(n-1) / cosh⁻¹((λ_max + λ₂) / (λ_max - λ₂))⌉
+        if is_connected and abs(lambda_max - lambda2) < 1e-6:
+            # Near-complete graph: all non-zero eigenvalues are equal,
+            # so the spectral ratio diverges and the graph has diameter 1.
+            diameter_estimate = 1.0
+        elif is_connected and lambda_max > lambda2:
+            ratio = (lambda_max + lambda2) / (lambda_max - lambda2)
+            diameter_estimate = math.ceil(math.acosh(n - 1) / math.acosh(ratio))
         else:
             diameter_estimate = float("inf")
 

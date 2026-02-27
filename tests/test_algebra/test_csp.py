@@ -18,6 +18,7 @@ from agenticraft_foundation.algebra import (
     Sequential,
     Skip,
     Stop,
+    Variable,
     choice,
     hide,
     interleave,
@@ -350,3 +351,274 @@ class TestSubstitution:
         inner = rec("X", var("Y"))
         result = substitute(inner, "Y", skip())
         assert isinstance(result, Recursion)
+
+    def test_substitute_internal_choice(self):
+        """Test substituting in internal choice."""
+        c = internal_choice(var("X"), prefix("b", skip()))
+        result = substitute(c, "X", stop())
+        assert isinstance(result, InternalChoice)
+        assert isinstance(result.left, Stop)
+
+    def test_substitute_parallel(self):
+        """Test substituting in parallel composition."""
+        p = parallel(var("X"), prefix("b", skip()))
+        result = substitute(p, "X", prefix("a", skip()))
+        assert isinstance(result, Parallel)
+        assert isinstance(result.left, Prefix)
+
+    def test_substitute_sequential(self):
+        """Test substituting in sequential composition."""
+        s = sequential(var("X"), prefix("b", skip()))
+        result = substitute(s, "X", prefix("a", skip()))
+        assert isinstance(result, Sequential)
+        assert isinstance(result.first, Prefix)
+
+    def test_substitute_hiding(self):
+        """Test substituting in hiding."""
+        h = hide(var("X"), {"a"})
+        result = substitute(h, "X", prefix("a", skip()))
+        assert isinstance(result, Hiding)
+
+    def test_substitute_recursion_shadowed_same_var(self):
+        """Test substitution respects variable shadowing in recursion."""
+        # μX.(X) — substituting X should not affect the body
+        r = rec("X", var("X"))
+        result = substitute(r, "X", stop())
+        # The recursion binds X, so substitution should leave it unchanged
+        assert isinstance(result, Recursion)
+        assert result.variable == "X"
+
+    def test_substitute_recursion_different_var(self):
+        """Test substitution in recursion body for different variable."""
+        r = rec("X", prefix("a", var("Y")))
+        result = substitute(r, "Y", skip())
+        assert isinstance(result, Recursion)
+        # Y should be replaced in the body
+        assert isinstance(result.body, Prefix)
+        assert isinstance(result.body.continuation, Skip)
+
+    def test_substitute_stop_skip_unchanged(self):
+        """Test that Stop and Skip are unchanged by substitution."""
+        assert isinstance(substitute(stop(), "X", skip()), Stop)
+        assert isinstance(substitute(skip(), "X", stop()), Skip)
+
+    def test_substitute_unmatched_variable(self):
+        """Test variable with different name is unchanged."""
+        v = var("Y")
+        result = substitute(v, "X", stop())
+        assert isinstance(result, Variable)
+        assert result.name == "Y"
+
+
+class TestSkipExtended:
+    """Extended tests for SKIP process."""
+
+    def test_skip_after_non_tick_raises(self):
+        """Test SKIP raises ValueError for non-tick events."""
+        s = Skip()
+        with pytest.raises(ValueError, match="not"):
+            s.after(Event("a"))
+
+
+class TestExternalChoiceExtended:
+    """Extended tests for External Choice."""
+
+    def test_choice_alphabet(self):
+        """Test choice alphabet is union of both sides."""
+        c = choice(prefix("a", skip()), prefix("b", skip()))
+        assert Event("a") in c.alphabet()
+        assert Event("b") in c.alphabet()
+
+    def test_choice_nondeterministic_both_branches(self):
+        """Test external choice when both branches offer the same event."""
+        left = prefix("a", prefix("x", skip()))
+        right = prefix("a", prefix("y", skip()))
+        c = choice(left, right)
+        # When both offer 'a', result is internal choice
+        result = c.after(Event("a"))
+        assert isinstance(result, InternalChoice)
+
+    def test_choice_neither_branch_raises(self):
+        """Test error when neither branch can perform event."""
+        c = choice(prefix("a", skip()), prefix("b", skip()))
+        with pytest.raises(ValueError, match="Neither"):
+            c.after(Event("c"))
+
+    def test_choice_repr(self):
+        """Test external choice string representation."""
+        c = choice(prefix("a", skip()), prefix("b", skip()))
+        assert "□" in repr(c)
+
+
+class TestInternalChoiceExtended:
+    """Extended tests for Internal Choice."""
+
+    def test_internal_choice_kind(self):
+        """Test internal choice has correct kind."""
+        c = internal_choice(prefix("a", skip()), prefix("b", skip()))
+        assert c.kind == ProcessKind.INTERNAL_CHOICE
+
+    def test_internal_choice_alphabet(self):
+        """Test internal choice alphabet is union."""
+        c = internal_choice(prefix("a", skip()), prefix("b", skip()))
+        assert Event("a") in c.alphabet()
+        assert Event("b") in c.alphabet()
+
+    def test_internal_choice_after_event_from_left(self):
+        """Test performing event from left branch of internal choice."""
+        left = prefix("a", skip())
+        right = prefix("b", skip())
+        c = internal_choice(left, right)
+        result = c.after(Event("a"))
+        assert isinstance(result, Skip)
+
+    def test_internal_choice_after_event_from_right(self):
+        """Test performing event from right branch (not in left)."""
+        left = prefix("a", skip())
+        right = prefix("b", skip())
+        c = internal_choice(left, right)
+        result = c.after(Event("b"))
+        assert isinstance(result, Skip)
+
+    def test_internal_choice_after_unknown_raises(self):
+        """Test error when event is in neither branch."""
+        c = internal_choice(prefix("a", skip()), prefix("b", skip()))
+        with pytest.raises(ValueError, match="Cannot perform"):
+            c.after(Event("c"))
+
+    def test_internal_choice_repr(self):
+        """Test internal choice string representation."""
+        c = internal_choice(prefix("a", skip()), prefix("b", skip()))
+        assert "⊓" in repr(c)
+
+
+class TestParallelExtended:
+    """Extended tests for Parallel composition."""
+
+    def test_parallel_sync_event_not_both_ready_raises(self):
+        """Test sync event raises when only one side is ready."""
+        p = parallel(prefix("a", skip()), prefix("b", skip()), {"a"})
+        with pytest.raises(ValueError, match="requires both"):
+            p.after(Event("a"))
+
+    def test_parallel_neither_can_perform_raises(self):
+        """Test error when neither process can perform unsync'd event."""
+        p = interleave(prefix("a", skip()), prefix("b", skip()))
+        with pytest.raises(ValueError, match="Neither"):
+            p.after(Event("c"))
+
+    def test_parallel_repr_with_sync_set(self):
+        """Test parallel repr with sync set."""
+        p = parallel(prefix("a", skip()), prefix("a", skip()), {"a"})
+        assert "|[" in repr(p)
+
+
+class TestSequentialExtended:
+    """Extended tests for Sequential composition."""
+
+    def test_sequential_kind(self):
+        """Test sequential has correct kind."""
+        s = sequential(prefix("a", skip()), prefix("b", skip()))
+        assert s.kind == ProcessKind.SEQUENTIAL
+
+    def test_sequential_alphabet(self):
+        """Test sequential alphabet combines both (tick hidden from first)."""
+        s = sequential(prefix("a", skip()), prefix("b", skip()))
+        assert Event("a") in s.alphabet()
+        assert Event("b") in s.alphabet()
+
+    def test_sequential_after_raises_for_invalid(self):
+        """Test sequential raises for events not in either process."""
+        s = sequential(prefix("a", skip()), prefix("b", skip()))
+        with pytest.raises(ValueError, match="Cannot perform"):
+            s.after(Event("c"))
+
+    def test_sequential_repr(self):
+        """Test sequential string representation."""
+        s = sequential(prefix("a", skip()), prefix("b", skip()))
+        assert ";" in repr(s)
+
+
+class TestHidingExtended:
+    """Extended tests for Hiding."""
+
+    def test_hiding_kind(self):
+        """Test hiding has correct kind."""
+        h = hide(prefix("a", skip()), {"a"})
+        assert h.kind == ProcessKind.HIDING
+
+    def test_hiding_after_tau(self):
+        """Test performing τ on hiding executes hidden event."""
+        h = hide(prefix("a", prefix("b", skip())), {"a"})
+        result = h.after(TAU)
+        assert isinstance(result, Hiding)
+
+    def test_hiding_after_visible_event(self):
+        """Test performing visible event through hiding."""
+        h = hide(prefix("a", prefix("b", skip())), {"a"})
+        # First perform τ (hidden a), then b is visible
+        inner = h.after(TAU)
+        result = inner.after(Event("b"))
+        assert isinstance(result, Hiding)
+
+    def test_hiding_after_hidden_event_raises(self):
+        """Test directly performing a hidden event raises."""
+        h = hide(prefix("a", skip()), {"a"})
+        with pytest.raises(ValueError, match="hidden"):
+            h.after(Event("a"))
+
+    def test_hiding_after_tau_no_hidden_available_raises(self):
+        """Test τ raises when no hidden events are possible."""
+        # b is not hidden, so τ should fail
+        h = hide(prefix("b", skip()), {"a"})
+        with pytest.raises(ValueError, match="No hidden"):
+            h.after(TAU)
+
+    def test_hiding_repr(self):
+        """Test hiding string representation."""
+        h = hide(prefix("a", skip()), {"a"})
+        assert "\\\\" in repr(h)
+
+
+class TestVariableExtended:
+    """Extended tests for Variable."""
+
+    def test_variable_kind(self):
+        """Test variable has correct kind."""
+        v = var("X")
+        assert v.kind == ProcessKind.VARIABLE
+
+    def test_variable_alphabet(self):
+        """Test unbound variable has empty alphabet."""
+        v = var("X")
+        assert v.alphabet() == frozenset()
+
+    def test_variable_initials(self):
+        """Test unbound variable has no initials."""
+        v = var("X")
+        assert v.initials() == frozenset()
+
+    def test_variable_after_raises(self):
+        """Test unbound variable raises on after."""
+        v = var("X")
+        with pytest.raises(ValueError, match="unbound"):
+            v.after(Event("a"))
+
+    def test_variable_repr(self):
+        """Test variable repr."""
+        v = var("X")
+        assert repr(v) == "X"
+
+
+class TestRecursionExtended:
+    """Extended tests for Recursion."""
+
+    def test_recursion_alphabet(self):
+        """Test recursion alphabet from body."""
+        r = rec("X", prefix("a", var("X")))
+        assert Event("a") in r.alphabet()
+
+    def test_recursion_repr(self):
+        """Test recursion repr."""
+        r = rec("X", prefix("a", var("X")))
+        assert "μX" in repr(r)

@@ -4,7 +4,7 @@ for multi-agent AI coordination.
 
 13 CSP operators | Multiparty Session Types | Spectral Topology | Protocol Analysis
 
-Zero runtime dependencies. Pure Python. 1012 tests.
+Minimal dependencies (NumPy). Pure Python. 1250+ tests.
 """
 
 from agenticraft_foundation._version import __version__
@@ -32,14 +32,16 @@ from agenticraft_foundation.algebra import (
     detect_deadlock,
     is_deadlock_free,
     substitute,
+    trace_equivalent,
     traces,
 )
 from agenticraft_foundation.mpst import SessionMonitor
-from agenticraft_foundation.topology import LaplacianAnalysis
+from agenticraft_foundation.topology import HypergraphNetwork, LaplacianAnalysis, NetworkGraph
+from agenticraft_foundation.verification import InvariantRegistry
 
 # NOTE: Full subpackage APIs are accessible via direct imports:
 #   from agenticraft_foundation.algebra import trace_refines, failures_refines, ...
-#   from agenticraft_foundation.topology import NetworkGraph, compare_topologies, ...
+#   from agenticraft_foundation.topology import compare_topologies, ...
 #   from agenticraft_foundation.mpst import Projector, SessionTypeChecker, ...
 #   from agenticraft_foundation.protocols import ...
 #   from agenticraft_foundation.verification import InvariantChecker, ...
@@ -73,11 +75,16 @@ __all__ = [
     "TIMEOUT_EVENT",
     # Semantics & Analysis
     "traces",
+    "trace_equivalent",
     "build_lts",
     "detect_deadlock",
     "is_deadlock_free",
     # Topology
     "LaplacianAnalysis",
+    "NetworkGraph",
+    "HypergraphNetwork",
     # Session Types
     "SessionMonitor",
+    # Verification
+    "InvariantRegistry",
 ]

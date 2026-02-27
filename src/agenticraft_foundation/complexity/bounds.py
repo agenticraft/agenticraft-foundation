@@ -95,12 +95,16 @@ CONSENSUS_BOUNDS = {
     ),
     "authenticated_byzantine": TheoreticalBound(
         problem="Authenticated Byzantine Consensus",
-        metric="messages",
+        metric="rounds",
         bound_type=BoundType.TIGHT,
-        expression="n",
+        expression="f+1",
         conditions=["digital signatures", "f < n/3 Byzantine"],
-        source="HotStuff, Yin et al. 2019",
-        proof_sketch="Linear messages with threshold signatures",
+        source="Dolev & Strong 1983",
+        proof_sketch=(
+            "With digital signatures, Byzantine consensus requires exactly"
+            " f+1 rounds; signatures prevent equivocation, reducing round"
+            " complexity from 2f+1 (unauthenticated) to f+1"
+        ),
     ),
 }
 

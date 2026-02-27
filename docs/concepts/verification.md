@@ -86,7 +86,7 @@ For stochastic agents, nondeterminism is replaced by probability. A DTMC assigns
 | **Steady-state** | Long-run fraction of time in each state? | Power iteration: $\pi = \pi P$ |
 | **Expected steps** | $\mathbb{E}[\text{steps to success}]$ = ? | Solve $e(s) = 1 + \sum P(s,s') \cdot e(s')$ |
 
-All algorithms are pure Python with zero dependencies. Gaussian elimination handles systems up to ~100 states exactly; value iteration provides a convergent fallback for larger systems.
+All algorithms are pure Python. Probabilistic verification uses NumPy for matrix operations. Gaussian elimination handles systems up to ~100 states exactly; value iteration provides a convergent fallback for larger systems.
 
 ## How It Maps to Code
 

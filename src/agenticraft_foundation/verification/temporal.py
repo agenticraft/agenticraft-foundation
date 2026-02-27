@@ -281,7 +281,9 @@ class AX(CTLFormula):
 class AF(CTLFormula):
     """AF φ: on all paths, φ eventually holds.
 
-    Equivalent to ¬EG(¬φ).
+    Equivalent to ¬EG(¬φ) by path-quantifier duality: AF φ holds iff
+    there is no path on which ¬φ holds globally.
+    Reference: Baier & Katoen (2008), Theorem 6.23.
 
     Attributes:
         formula: The formula that must eventually hold on all paths.

@@ -129,6 +129,8 @@ nav:
     - Consensus & MAS Mappings: concepts/consensus.md
     - Complexity & Fault Models: concepts/complexity.md
     - Verification: concepts/verification.md
+    - Scalability & Limits: concepts/scalability.md
+    - Comparison: concepts/comparison.md
 
   - Tutorials:
     - Overview: tutorials/index.md
@@ -196,6 +198,7 @@ nav:
 
   - Examples:
     - Overview: examples/index.md
+    - RAG Pipeline Verification: examples/rag-pipeline-verification.md
     - CSP Composition: examples/csp-composition.md
     - Interrupt & Timeout: examples/interrupt-timeout.md
     - Consensus Specification: examples/consensus-spec.md

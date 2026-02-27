@@ -121,6 +121,17 @@ class Process(ABC):
         return TICK in self.initials()
 
     @abstractmethod
+    def _state_key(self) -> tuple[object, ...]:
+        """Structural identity key for LTS state deduplication.
+
+        Returns a nested tuple that uniquely identifies the process
+        structure.  Used by ``LTSBuilder`` instead of ``repr()`` for
+        faster, correct state identity — structurally identical terms
+        always produce the same key.
+        """
+        pass
+
+    @abstractmethod
     def __repr__(self) -> str:
         pass
 
@@ -155,6 +166,9 @@ class Stop(Process):
     def after(self, event: Event) -> Process:
         raise ValueError(f"STOP cannot perform any event, including {event}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Stop",)
+
     def __repr__(self) -> str:
         return "STOP"
 
@@ -185,6 +199,9 @@ class Skip(Process):
         if event == TICK:
             return Stop()
         raise ValueError(f"SKIP can only perform ✓, not {event}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Skip",)
 
     def __repr__(self) -> str:
         return "SKIP"
@@ -220,6 +237,9 @@ class Prefix(Process):
             return self.continuation
         raise ValueError(f"Cannot perform {event}, expected {self.event}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Prefix", self.event, self.continuation._state_key())
+
     def __repr__(self) -> str:
         return f"{self.event} → {self.continuation}"
 
@@ -240,7 +260,7 @@ class ExternalChoice(Process):
     - initials(P □ Q) = initials(P) ∪ initials(Q)
     - P □ Q ─a→ P' if P ─a→ P' and a ∉ initials(Q)
     - P □ Q ─a→ Q' if Q ─a→ Q' and a ∉ initials(P)
-    - P □ Q ─a→ P' □ Q' if P ─a→ P' and Q ─a→ Q' (deterministic)
+    - P □ Q ─a→ P' ⊓ Q' if a ∈ initials(P) ∩ initials(Q) (nondeterministic)
     """
 
     left: Process
@@ -259,8 +279,9 @@ class ExternalChoice(Process):
     def after(self, event: Event) -> Process:
         """Resolve external choice by performing an event.
 
-        When both branches offer the event, the left branch is
-        chosen by convention (deterministic resolution).
+        When both branches offer the event, the result is an
+        internal (nondeterministic) choice between the two
+        continuations, per Roscoe (1998) §3.3.
 
         Args:
             event: The event to perform.
@@ -275,14 +296,17 @@ class ExternalChoice(Process):
         right_can = event in self.right.initials()
 
         if left_can and right_can:
-            # Both can perform - resolved to left branch by convention
-            return self.left.after(event)
+            # Both can perform - nondeterministic per CSP semantics
+            return InternalChoice(self.left.after(event), self.right.after(event))
         elif left_can:
             return self.left.after(event)
         elif right_can:
             return self.right.after(event)
         else:
             raise ValueError(f"Neither branch can perform {event}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("ExtChoice", self.left._state_key(), self.right._state_key())
 
     def __repr__(self) -> str:
         return f"({self.left} □ {self.right})"
@@ -327,6 +351,9 @@ class InternalChoice(Process):
         if event in self.right.initials():
             return self.right.after(event)
         raise ValueError(f"Cannot perform {event}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("IntChoice", self.left._state_key(), self.right._state_key())
 
     def __repr__(self) -> str:
         return f"({self.left} ⊓ {self.right})"
@@ -412,6 +439,9 @@ class Parallel(Process):
                 )
             raise ValueError(f"Neither process can perform {event}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Par", self.left._state_key(), self.right._state_key(), self.sync_set)
+
     def __repr__(self) -> str:
         if not self.sync_set:
             return f"({self.left} ||| {self.right})"
@@ -471,6 +501,9 @@ class Sequential(Process):
 
         raise ValueError(f"Cannot perform {event}")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Seq", self.first._state_key(), self.second._state_key())
+
     def __repr__(self) -> str:
         return f"({self.first} ; {self.second})"
 
@@ -527,6 +560,9 @@ class Hiding(Process):
             )
         raise ValueError(f"Event {event} is hidden")
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Hide", self.process._state_key(), self.hidden)
+
     def __repr__(self) -> str:
         hidden_str = ", ".join(sorted(self.hidden))
         return f"({self.process} \\\\ {{{hidden_str}}})"
@@ -565,6 +601,9 @@ class Recursion(Process):
         """Unfold one level of recursion."""
         return substitute(self.body, self.variable, self)
 
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Rec", self.variable, self.body._state_key())
+
     def __repr__(self) -> str:
         return f"μ{self.variable}.{self.body}"
 
@@ -591,6 +630,9 @@ class Variable(Process):
 
     def after(self, event: Event) -> Process:
         raise ValueError(f"Cannot perform events on unbound variable {self.name}")
+
+    def _state_key(self) -> tuple[object, ...]:
+        return ("Var", self.name)
 
     def __repr__(self) -> str:
         return self.name

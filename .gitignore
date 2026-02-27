@@ -26,6 +26,7 @@ venv/
 htmlcov/
 .pytest_cache/
 .mypy_cache/
+.hypothesis/
 
 # Docs build
 site/

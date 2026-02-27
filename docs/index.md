@@ -5,7 +5,11 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)
 ![License](https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square)
 
-**Formally verified mathematical foundations for multi-agent AI coordination.** AgentiCraft Foundation provides 8 modules spanning CSP process algebra, multiparty session types, protocol-aware routing, spectral topology analysis, and formal specification -- all with zero runtime dependencies. The library delivers the mathematical guarantees that production multi-agent systems need: deadlock freedom, trace refinement, protocol well-formedness, and topology resilience bounds.
+**Formally verified mathematical foundations for multi-agent AI coordination.**
+
+The core verification engine behind [AgentiCraft](https://agenticraft.ai) — an enterprise-grade platform for building production-ready AI agents and multi-agent systems.
+
+AgentiCraft Foundation provides 8 modules spanning CSP process algebra, multiparty session types, protocol-aware routing, spectral topology analysis, and formal specification -- all with minimal runtime dependencies (NumPy only). The library delivers the mathematical guarantees that production multi-agent systems need: deadlock freedom, trace refinement, protocol well-formedness, and topology resilience bounds.
 
 ---
 
@@ -108,7 +112,7 @@ graph TB
 | **verification** | Verification -- CTL temporal logic model checking, DTMC probabilistic analysis, invariant checking, counterexample generation | 199 |
 | **integration** | Integration adapters -- MPST bridge for protocol session types, CSP orchestration for workflow verification | 52 |
 
-**Total: 8 modules, 1,165 tests, ~20K LOC, zero dependencies.**
+**Total: 8 modules, 1,300+ tests, ~20K LOC, minimal dependencies (NumPy only).**
 
 ---
 

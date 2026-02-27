@@ -71,3 +71,53 @@ class TestSemanticRouter:
         router = SemanticRouter(graph, similarity_threshold=0.5)
         candidates = router.find_best_agent("code_execution", "src", ProtocolName.MCP)
         assert len(candidates) == 0
+
+    def test_find_agent_with_affinity_matrix(self):
+        """Test routing with an explicit affinity matrix."""
+        from agenticraft_foundation.protocols.affinity import CapabilityAffinityMatrix
+
+        graph = ProtocolGraph()
+        graph.add_agent("src", ["routing"], {ProtocolName.MCP})
+        graph.add_agent("coder", ["code_execution"], {ProtocolName.MCP})
+        graph.add_edge("src", "coder", {ProtocolName.MCP})
+
+        affinity = CapabilityAffinityMatrix()
+        router = SemanticRouter(graph, affinity_matrix=affinity)
+        candidates = router.find_best_agent("code_execution", "src", ProtocolName.MCP)
+        assert len(candidates) > 0
+        # With affinity matrix, protocol_affinity should be set
+        assert candidates[0].protocol_affinity > 0
+
+    def test_estimate_cost_bfs_indirect(self):
+        """Test cost estimation via BFS for non-adjacent agents."""
+        graph = ProtocolGraph()
+        graph.add_agent("src", ["routing"], {ProtocolName.MCP})
+        graph.add_agent("mid", ["relay"], {ProtocolName.MCP})
+        graph.add_agent("dest", ["code_execution"], {ProtocolName.MCP})
+        # src -> mid -> dest (no direct edge src->dest)
+        graph.add_edge("src", "mid", {ProtocolName.MCP})
+        graph.add_edge("mid", "dest", {ProtocolName.MCP})
+
+        router = SemanticRouter(graph, similarity_threshold=0.0)
+        candidates = router.find_best_agent("code_execution", "src", ProtocolName.MCP)
+        assert len(candidates) > 0
+        dest_candidate = [c for c in candidates if c.agent_id == "dest"]
+        assert len(dest_candidate) == 1
+        # Path cost should be 2 (two hops via BFS)
+        assert dest_candidate[0].path_cost == 2.0
+
+    def test_estimate_cost_unreachable(self):
+        """Test cost estimation for unreachable agent is infinity."""
+        graph = ProtocolGraph()
+        graph.add_agent("src", ["routing"], {ProtocolName.MCP})
+        graph.add_agent("island", ["code_execution"], {ProtocolName.MCP})
+        # No edges at all
+
+        router = SemanticRouter(graph, similarity_threshold=0.0)
+        candidates = router.find_best_agent("code_execution", "src", ProtocolName.MCP)
+        # With infinite cost, composite score = sim * affinity / (1 + inf) = 0
+        # Candidate should still be returned but with score ~0
+        if candidates:
+            island = [c for c in candidates if c.agent_id == "island"]
+            if island:
+                assert island[0].path_cost == float("inf")

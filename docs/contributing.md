@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 ## Testing
 
 - **Framework:** pytest
-- **Coverage minimum:** 85%
+- **Coverage minimum:** 90%
 - **Test naming:** `test_<module>_<function>_<scenario>`
 - **Marks:**
     - `@pytest.mark.slow` -- long-running tests

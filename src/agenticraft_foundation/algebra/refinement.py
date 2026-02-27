@@ -11,9 +11,9 @@ Refinement is the key relation for verification:
 - If IMPL ⊑ SPEC, IMPL is a valid implementation
 
 Note on direction:
-- In CSP: SPEC ⊑ IMPL means "SPEC is refined by IMPL"
-- IMPL can do less than SPEC (subset of traces)
-- We check: traces(IMPL) ⊆ traces(SPEC)
+- In CSP: SPEC ⊑_T IMPL reads "SPEC is trace-refined by IMPL"
+- This means traces(IMPL) ⊆ traces(SPEC): IMPL has fewer behaviors
+- Equivalently: IMPL does nothing outside what SPEC allows
 """
 
 from __future__ import annotations

@@ -4,6 +4,7 @@ Annotated walkthroughs of the example scripts in the `examples/` directory. Each
 
 | Example | Module | Description |
 |---------|--------|-------------|
+| [RAG Pipeline Verification](rag-pipeline-verification.md) | algebra + verification + topology | **End-to-end**: 4-agent pipeline, deadlock detection, timeout fix, spectral analysis, CTL model checking |
 | [CSP Composition](csp-composition.md) | algebra | All 13 CSP operators, LTS analysis, deadlock detection |
 | [Interrupt & Timeout](interrupt-timeout.md) | algebra | 5 agent-specific extensions with practical scenarios |
 | [Consensus Specification](consensus-spec.md) | algebra + specifications | 3-agent consensus modeled in CSP |
