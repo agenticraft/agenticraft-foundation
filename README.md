@@ -9,7 +9,7 @@
 <br/>
 
 [![CI](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml/badge.svg)](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/master/graph/badge.svg)](https://codecov.io/gh/agenticraft/agenticraft-foundation)
+[![codecov](https://codecov.io/gh/agenticraft/agenticraft-foundation/branch/main/graph/badge.svg)](https://codecov.io/gh/agenticraft/agenticraft-foundation)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
