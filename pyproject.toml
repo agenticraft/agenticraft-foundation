@@ -43,7 +43,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://agenticraft.ai"
-Documentation = "https://github.com/agenticraft/agenticraft-foundation"
+Documentation = "https://agenticraft.github.io/agenticraft-foundation/"
 Repository = "https://github.com/agenticraft/agenticraft-foundation"
 Issues = "https://github.com/agenticraft/agenticraft-foundation/issues"
 
