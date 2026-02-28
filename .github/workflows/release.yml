@@ -69,3 +69,5 @@ jobs:
       - name: Publish to PyPI
         if: "!contains(github.ref, 'alpha') && !contains(github.ref, 'beta')"
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
