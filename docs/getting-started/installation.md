@@ -43,4 +43,27 @@ uv sync --group dev
 uv run pytest tests/ -v
 ```
 
-The full test suite (1,300+ tests) should complete in under a minute on most machines. All tests run without network access or external services.
+The full test suite (1,350+ tests) should complete in under a minute on most machines. All tests run without network access or external services.
+
+### Dev Container (VS Code / GitHub Codespaces)
+
+The repository includes a [Dev Container](https://containers.dev/) configuration for a zero-setup development environment. It comes pre-configured with Python 3.12, uv, Ruff, and mypy.
+
+**VS Code:**
+
+1. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+2. Open the repository in VS Code
+3. Click "Reopen in Container" when prompted (or run `Dev Containers: Reopen in Container` from the command palette)
+
+Dependencies install automatically. Format-on-save is enabled with Ruff.
+
+**GitHub Codespaces:**
+
+Click the green "Code" button on the repository and select "Open with Codespaces". The dev container configuration is picked up automatically.
+
+**Docker (manual):**
+
+```bash
+docker build -t agenticraft-foundation .devcontainer/
+docker run -it -v $(pwd):/workspace agenticraft-foundation bash
+```

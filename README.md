@@ -229,6 +229,15 @@ uv run ruff format src/ tests/
 uv run mypy src/
 ```
 
+### Dev Container
+
+Open in VS Code with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for a ready-to-go environment -- Python 3.12, uv, Ruff, and mypy pre-configured with format-on-save.
+
+```bash
+# Or build manually with Docker
+docker build -t agenticraft-foundation .devcontainer/
+```
+
 ## Why Formal Methods for Agents?
 
 Multi-agent systems fail in production because coordination bugs are invisible until runtime. Formal verification catches them at design time:
