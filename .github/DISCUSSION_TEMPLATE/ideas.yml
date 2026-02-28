@@ -1,0 +1,23 @@
+title: "[Idea] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share ideas for new features, improvements, or research directions.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: Describe your idea and how it would improve the library.
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional Details
+      description: Any supporting material — papers, diagrams, code sketches.
+    validations:
+      required: false

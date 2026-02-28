@@ -1,0 +1,23 @@
+title: "[Show & Tell] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share what you've built with agenticraft-foundation!
+
+  - type: textarea
+    id: project
+    attributes:
+      label: What did you build?
+      description: Describe your project and how you used the library.
+    validations:
+      required: true
+
+  - type: textarea
+    id: highlights
+    attributes:
+      label: Highlights
+      description: Interesting findings, patterns, or techniques worth sharing.
+    validations:
+      required: false

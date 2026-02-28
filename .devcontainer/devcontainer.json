@@ -1,0 +1,25 @@
+{
+  "name": "agenticraft-foundation",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/astral-sh/uv-devcontainer-features/uv:1": {}
+  },
+  "postCreateCommand": "uv sync --group dev",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": ".venv/bin/python",
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true
+        },
+        "python.analysis.typeCheckingMode": "basic"
+      },
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-python.mypy-type-checker"
+      ]
+    }
+  }
+}

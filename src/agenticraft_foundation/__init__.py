@@ -36,6 +36,14 @@ from agenticraft_foundation.algebra import (
     traces,
 )
 from agenticraft_foundation.mpst import SessionMonitor
+from agenticraft_foundation.serialization import (
+    graph_from_dict,
+    graph_to_dict,
+    lts_from_dict,
+    lts_to_dict,
+    process_from_dict,
+    process_to_dict,
+)
 from agenticraft_foundation.topology import HypergraphNetwork, LaplacianAnalysis, NetworkGraph
 from agenticraft_foundation.verification import InvariantRegistry
 
@@ -87,4 +95,11 @@ __all__ = [
     "SessionMonitor",
     # Verification
     "InvariantRegistry",
+    # Serialization
+    "process_to_dict",
+    "process_from_dict",
+    "lts_to_dict",
+    "lts_from_dict",
+    "graph_to_dict",
+    "graph_from_dict",
 ]

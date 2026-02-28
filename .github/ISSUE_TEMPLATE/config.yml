@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://agenticraft.github.io/agenticraft-foundation/
+    about: Check the documentation before opening an issue.
+  - name: Discussions
+    url: https://github.com/agenticraft/agenticraft-foundation/discussions
+    about: Ask questions and share ideas in Discussions.
