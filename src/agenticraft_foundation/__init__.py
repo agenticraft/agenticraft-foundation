@@ -43,6 +43,7 @@ from agenticraft_foundation.serialization import (
     graph_to_json,
     lts_from_dict,
     lts_from_json,
+    lts_to_ascii,
     lts_to_dict,
     lts_to_json,
     process_from_dict,
@@ -113,6 +114,7 @@ __all__ = [
     "process_from_json",
     "lts_to_json",
     "lts_from_json",
+    "lts_to_ascii",
     "graph_to_json",
     "graph_from_json",
 ]

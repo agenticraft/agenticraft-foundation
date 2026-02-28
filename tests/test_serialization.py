@@ -51,6 +51,7 @@ from agenticraft_foundation.serialization import (
     liveness_analysis_to_dict,
     lts_from_dict,
     lts_from_json,
+    lts_to_ascii,
     lts_to_dict,
     lts_to_json,
     process_from_dict,
@@ -548,3 +549,94 @@ class TestJSONWrappers:
         result = graph_to_json(graph, indent=4)
         assert "\n" in result
         assert "    " in result
+
+
+# ── LTS ASCII pretty-print tests ─────────────────────────────────────
+
+
+class TestLTSAscii:
+    """Tests for lts_to_ascii pretty-printer."""
+
+    def test_prefix_stop(self):
+        """a -> STOP produces initial state with one transition to a deadlock."""
+        process = Prefix(event=Event("a"), continuation=Stop())
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+
+        lines = result.splitlines()
+        assert lines[0] == "LTS (2 states, 1 transitions)"
+        assert "[0] (initial)" in result
+        assert "  --a--> [1]" in result
+        assert "(deadlock)" in result
+
+    def test_external_choice(self):
+        """External choice produces branching transitions from initial state."""
+        process = ExternalChoice(
+            left=Prefix(event=Event("a"), continuation=Stop()),
+            right=Prefix(event=Event("b"), continuation=Stop()),
+        )
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+
+        assert "[0] (initial)" in result
+        assert "  --a-->" in result
+        assert "  --b-->" in result
+
+    def test_sequential_terminal(self):
+        """Sequential process marks the final state as terminal."""
+        process = Prefix(event=Event("a"), continuation=Skip())
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+
+        assert "(terminal)" in result
+
+    def test_single_stop(self):
+        """STOP alone is both initial and deadlock on the same state."""
+        lts = build_lts(Stop())
+        result = lts_to_ascii(lts)
+
+        assert "LTS (1 states, 0 transitions)" in result
+        assert "[0] (initial, deadlock)" in result
+
+    def test_combined_annotations(self):
+        """A state can carry multiple annotations."""
+        process = Sequential(
+            first=Skip(),
+            second=Stop(),
+        )
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+
+        # At least one state should have multiple annotations
+        has_combined = any(
+            line.count(",") >= 1 and line.startswith("[") for line in result.splitlines()
+        )
+        assert has_combined
+
+    def test_header_format(self):
+        """Header line matches 'LTS (N states, M transitions)' format."""
+        process = Prefix(
+            event=Event("x"),
+            continuation=Prefix(event=Event("y"), continuation=Stop()),
+        )
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+        header = result.splitlines()[0]
+
+        assert header == f"LTS ({lts.num_states} states, {lts.num_transitions} transitions)"
+
+    def test_transitions_sorted_by_event(self):
+        """Outgoing transitions are sorted alphabetically by event name."""
+        process = ExternalChoice(
+            left=Prefix(event=Event("z"), continuation=Stop()),
+            right=Prefix(event=Event("a"), continuation=Stop()),
+        )
+        lts = build_lts(process)
+        result = lts_to_ascii(lts)
+
+        # Find transition lines under the initial state
+        lines = result.splitlines()
+        trans_lines = [line for line in lines if line.startswith("  --")]
+        # "a" should come before "z"
+        assert trans_lines[0].startswith("  --a-->")
+        assert trans_lines[1].startswith("  --z-->")

@@ -527,6 +527,48 @@ def lts_from_json(json_str: str) -> LTS:
     return lts_from_dict(json.loads(json_str))
 
 
+def lts_to_ascii(lts: LTS) -> str:
+    """Render an LTS as a human-readable ASCII state diagram.
+
+    Args:
+        lts: An LTS instance.
+
+    Returns:
+        A multi-line string showing states, annotations, and transitions.
+
+    Example output::
+
+        LTS (3 states, 2 transitions)
+        [0] (initial)
+          --a--> [1]
+          --b--> [2]
+        [1] (deadlock)
+        [2] (terminal)
+    """
+    lines: list[str] = []
+    lines.append(f"LTS ({lts.num_states} states, {lts.num_transitions} transitions)")
+
+    for state_id in sorted(lts.states):
+        state = lts.states[state_id]
+
+        annotations: list[str] = []
+        if state_id == lts.initial_state:
+            annotations.append("initial")
+        if state.is_deadlock:
+            annotations.append("deadlock")
+        if state.is_terminal:
+            annotations.append("terminal")
+
+        suffix = f" ({', '.join(annotations)})" if annotations else ""
+        lines.append(f"[{state_id}]{suffix}")
+
+        outgoing = lts.get_transitions_from(state_id)
+        for t in sorted(outgoing, key=lambda t: str(t.event)):
+            lines.append(f"  --{t.event}--> [{t.target}]")
+
+    return "\n".join(lines)
+
+
 def graph_to_json(graph: ProtocolGraph, **kwargs: Any) -> str:
     """Serialize a ProtocolGraph to a JSON string.
 
@@ -565,6 +607,7 @@ __all__ = [
     "lts_from_dict",
     "lts_to_json",
     "lts_from_json",
+    "lts_to_ascii",
     # Analysis
     "deadlock_analysis_to_dict",
     "deadlock_analysis_from_dict",
