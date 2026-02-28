@@ -44,13 +44,19 @@ from agenticraft_foundation.serialization import (
     deadlock_analysis_from_dict,
     deadlock_analysis_to_dict,
     graph_from_dict,
+    graph_from_json,
     graph_to_dict,
+    graph_to_json,
     liveness_analysis_from_dict,
     liveness_analysis_to_dict,
     lts_from_dict,
+    lts_from_json,
     lts_to_dict,
+    lts_to_json,
     process_from_dict,
+    process_from_json,
     process_to_dict,
+    process_to_json,
     protocol_edge_from_dict,
     protocol_edge_to_dict,
     transition_from_dict,
@@ -427,3 +433,118 @@ class TestProtocolGraphSerialization:
         assert len(restored.edges) == 0
         assert restored.protocols == {ProtocolName.CUSTOM}
         assert restored.metadata == {"version": "1.0"}
+
+
+# ── JSON convenience wrapper tests ───────────────────────────────────
+
+
+class TestJSONWrappers:
+    """Round-trip tests for to_json/from_json convenience wrappers."""
+
+    def test_process_to_json_returns_string(self):
+        p = Prefix(event=Event("a"), continuation=Stop())
+        result = process_to_json(p)
+        assert isinstance(result, str)
+        parsed = json.loads(result)
+        assert parsed["type"] == "Prefix"
+        assert parsed["event"] == "a"
+
+    def test_process_json_roundtrip(self):
+        p = Parallel(
+            left=Prefix(event=Event("a"), continuation=Stop()),
+            right=Prefix(event=Event("b"), continuation=Skip()),
+            sync_set=frozenset({Event("a")}),
+        )
+        json_str = process_to_json(p)
+        restored = process_from_json(json_str)
+        assert restored == p
+
+    def test_process_to_json_with_indent(self):
+        p = Prefix(event=Event("x"), continuation=Stop())
+        result = process_to_json(p, indent=2)
+        assert "\n" in result
+        assert "  " in result
+
+    def test_process_json_nested_tree(self):
+        p = Sequential(
+            first=ExternalChoice(
+                left=Prefix(event=Event("a"), continuation=Stop()),
+                right=Prefix(event=Event("b"), continuation=Skip()),
+            ),
+            second=Recursion(
+                variable="X",
+                body=Prefix(event=Event("tick"), continuation=Variable(name="X")),
+            ),
+        )
+        restored = process_from_json(process_to_json(p))
+        assert restored == p
+
+    def test_process_json_guard_with_registry(self):
+        from agenticraft_foundation.algebra.operators import Guard
+
+        cond = lambda: True  # noqa: E731
+        p = Guard(condition=cond, process=Stop())
+        json_str = process_to_json(p)
+        restored = process_from_json(json_str, condition_registry={"<callable>": cond})
+        assert isinstance(restored, Guard)
+
+    def test_process_json_guard_without_registry_raises(self):
+        from agenticraft_foundation.algebra.operators import Guard
+
+        p = Guard(condition=lambda: True, process=Stop())
+        json_str = process_to_json(p)
+        with pytest.raises(ValueError, match="condition_registry"):
+            process_from_json(json_str)
+
+    def test_lts_json_roundtrip(self):
+        process = Prefix(event=Event("a"), continuation=Stop())
+        lts = build_lts(process)
+        json_str = lts_to_json(lts)
+        assert isinstance(json_str, str)
+        restored = lts_from_json(json_str)
+        assert restored.initial_state == lts.initial_state
+        assert restored.num_states == lts.num_states
+        assert restored.num_transitions == lts.num_transitions
+        assert restored.alphabet == lts.alphabet
+
+    def test_lts_json_with_indent(self):
+        process = ExternalChoice(
+            left=Prefix(event=Event("a"), continuation=Stop()),
+            right=Prefix(event=Event("b"), continuation=Stop()),
+        )
+        lts = build_lts(process)
+        result = lts_to_json(lts, indent=2)
+        assert "\n" in result
+
+    def test_graph_json_roundtrip(self):
+        graph = ProtocolGraph()
+        graph.add_agent(
+            "agent-1",
+            capabilities=["search"],
+            protocols={ProtocolName.MCP},
+            node_type=NodeType.LLM_AGENT,
+        )
+        graph.add_agent(
+            "agent-2",
+            capabilities=["code"],
+            protocols={ProtocolName.A2A},
+            node_type=NodeType.TOOL_SERVER,
+        )
+        graph.add_edge(
+            "agent-1",
+            "agent-2",
+            protocols={ProtocolName.MCP},
+            weights={ProtocolName.MCP: 2.0},
+        )
+        json_str = graph_to_json(graph)
+        assert isinstance(json_str, str)
+        restored = graph_from_json(json_str)
+        assert len(restored.agents) == 2
+        assert len(restored.edges) == len(graph.edges)
+        assert restored.protocols == graph.protocols
+
+    def test_graph_json_with_indent(self):
+        graph = ProtocolGraph(protocols={ProtocolName.CUSTOM})
+        result = graph_to_json(graph, indent=4)
+        assert "\n" in result
+        assert "    " in result

@@ -17,6 +17,7 @@ Supported types:
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from agenticraft_foundation.algebra.csp import (
@@ -467,15 +468,103 @@ def graph_from_dict(data: dict[str, Any]) -> ProtocolGraph:
     return graph
 
 
+# ── JSON convenience wrappers ─────────────────────────────────────────
+
+
+def process_to_json(process: Process, **kwargs: Any) -> str:
+    """Serialize a CSP process tree to a JSON string.
+
+    Args:
+        process: Any CSP Process instance.
+        **kwargs: Additional keyword arguments passed to :func:`json.dumps`
+            (e.g., ``indent=2``).
+
+    Returns:
+        A JSON string.
+    """
+    return json.dumps(process_to_dict(process), **kwargs)
+
+
+def process_from_json(
+    json_str: str,
+    condition_registry: dict[str, Any] | None = None,
+) -> Process:
+    """Reconstruct a CSP process tree from a JSON string.
+
+    Args:
+        json_str: JSON string previously produced by :func:`process_to_json`.
+        condition_registry: Optional mapping of condition names to callables,
+            used to reconstruct Guard processes.
+
+    Returns:
+        The reconstructed Process.
+    """
+    return process_from_dict(json.loads(json_str), condition_registry)
+
+
+def lts_to_json(lts: LTS, **kwargs: Any) -> str:
+    """Serialize an LTS to a JSON string.
+
+    Args:
+        lts: An LTS instance.
+        **kwargs: Additional keyword arguments passed to :func:`json.dumps`.
+
+    Returns:
+        A JSON string.
+    """
+    return json.dumps(lts_to_dict(lts), **kwargs)
+
+
+def lts_from_json(json_str: str) -> LTS:
+    """Reconstruct an LTS from a JSON string.
+
+    Args:
+        json_str: JSON string previously produced by :func:`lts_to_json`.
+
+    Returns:
+        The reconstructed LTS.
+    """
+    return lts_from_dict(json.loads(json_str))
+
+
+def graph_to_json(graph: ProtocolGraph, **kwargs: Any) -> str:
+    """Serialize a ProtocolGraph to a JSON string.
+
+    Args:
+        graph: A ProtocolGraph instance.
+        **kwargs: Additional keyword arguments passed to :func:`json.dumps`.
+
+    Returns:
+        A JSON string.
+    """
+    return json.dumps(graph_to_dict(graph), **kwargs)
+
+
+def graph_from_json(json_str: str) -> ProtocolGraph:
+    """Reconstruct a ProtocolGraph from a JSON string.
+
+    Args:
+        json_str: JSON string previously produced by :func:`graph_to_json`.
+
+    Returns:
+        The reconstructed ProtocolGraph.
+    """
+    return graph_from_dict(json.loads(json_str))
+
+
 __all__ = [
     # Process
     "process_to_dict",
     "process_from_dict",
+    "process_to_json",
+    "process_from_json",
     # LTS
     "transition_to_dict",
     "transition_from_dict",
     "lts_to_dict",
     "lts_from_dict",
+    "lts_to_json",
+    "lts_from_json",
     # Analysis
     "deadlock_analysis_to_dict",
     "deadlock_analysis_from_dict",
@@ -488,4 +577,6 @@ __all__ = [
     "protocol_edge_from_dict",
     "graph_to_dict",
     "graph_from_dict",
+    "graph_to_json",
+    "graph_from_json",
 ]
