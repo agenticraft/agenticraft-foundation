@@ -271,9 +271,7 @@ def process_from_dict(
     if type_tag == "Rename":
         return Rename(
             process=process_from_dict(data["process"], condition_registry),
-            mapping=tuple(
-                (Event(pair[0]), Event(pair[1])) for pair in data["mapping"]
-            ),
+            mapping=tuple((Event(pair[0]), Event(pair[1])) for pair in data["mapping"]),
         )
 
     if type_tag == "Pipe":
@@ -354,9 +352,7 @@ def deadlock_analysis_to_dict(analysis: DeadlockAnalysis) -> dict[str, Any]:
     return {
         "has_deadlock": analysis.has_deadlock,
         "deadlock_states": analysis.deadlock_states,
-        "deadlock_traces": [
-            [str(e) for e in trace] for trace in analysis.deadlock_traces
-        ],
+        "deadlock_traces": [[str(e) for e in trace] for trace in analysis.deadlock_traces],
     }
 
 
@@ -365,9 +361,7 @@ def deadlock_analysis_from_dict(data: dict[str, Any]) -> DeadlockAnalysis:
     return DeadlockAnalysis(
         has_deadlock=data["has_deadlock"],
         deadlock_states=data["deadlock_states"],
-        deadlock_traces=[
-            tuple(Event(e) for e in trace) for trace in data["deadlock_traces"]
-        ],
+        deadlock_traces=[tuple(Event(e) for e in trace) for trace in data["deadlock_traces"]],
     )
 
 
@@ -450,9 +444,7 @@ def graph_to_dict(graph: ProtocolGraph) -> dict[str, Any]:
     for (src, tgt), edge in graph.edges.items():
         edges[f"{src}->{tgt}"] = protocol_edge_to_dict(edge)
     return {
-        "agents": {
-            aid: agent_node_to_dict(node) for aid, node in graph.agents.items()
-        },
+        "agents": {aid: agent_node_to_dict(node) for aid, node in graph.agents.items()},
         "edges": edges,
         "protocols": sorted(p.value for p in graph.protocols),
         "metadata": graph.metadata,
