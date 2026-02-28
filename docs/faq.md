@@ -30,7 +30,7 @@ agent_a = Prefix(request, Prefix(process, Stop()))
 agent_b = Prefix(request, Prefix(complete, Stop()))
 
 # Parallel composition with synchronization on 'request'
-system = Parallel(agent_a, agent_b, sync_events={request})
+system = Parallel(agent_a, agent_b, sync_set=frozenset({request}))
 
 # Verify the system is deadlock-free
 assert is_deadlock_free(system)
@@ -122,7 +122,7 @@ worker = Prefix(task, Prefix(done, Skip()))
 coordinator = Prefix(task, Prefix(done, Skip()))
 
 # Coordinator and worker synchronize on both events
-system = Parallel(coordinator, worker, sync_events={task, done})
+system = Parallel(coordinator, worker, sync_set=frozenset({task, done}))
 ```
 
 See [Session Types](concepts/session-types.md) and the [MPST Tutorial](tutorials/mpst-verification.md) for more.
@@ -198,14 +198,14 @@ agent1 = Prefix(a, Prefix(b, Stop()))  # Wants a, then b
 agent2 = Prefix(b, Prefix(a, Stop()))  # Wants b, then a
 
 # Parallel with synchronization on both events
-system = Parallel(agent1, agent2, sync_events={a, b})
+system = Parallel(agent1, agent2, sync_set=frozenset({a, b}))
 
 # Check for deadlock
-lts = build_lts(system)
-if not is_deadlock_free(lts):
-    deadlock_state = detect_deadlock(lts)
-    print(f"Deadlock at state: {deadlock_state}")
-    print(f"Trace to deadlock: {lts.trace_to(deadlock_state)}")
+if not is_deadlock_free(system):
+    analysis = detect_deadlock(build_lts(system))
+    print(f"Has deadlock: {analysis.has_deadlock}")
+    print(f"Deadlock states: {analysis.deadlock_states}")
+    print(f"Traces: {analysis.deadlock_traces}")
 ```
 
 Common deadlock patterns to watch for:
