@@ -11,6 +11,7 @@ copyright: Copyright &copy; 2026 AgentiCraft Team
 
 theme:
   name: material
+
   logo: assets/logo.svg
   favicon: assets/favicon.svg
   font:
