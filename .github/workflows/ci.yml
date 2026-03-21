@@ -118,6 +118,11 @@ jobs:
       - name: Bandit security check
         run: uvx bandit -r src/agenticraft_foundation/ -ll
 
+      - name: pip-audit
+        run: |
+          uv pip compile pyproject.toml -q -o /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt
+
   build:
     runs-on: ubuntu-latest
     needs: [test, lint, typecheck]

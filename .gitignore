@@ -37,3 +37,12 @@ Thumbs.db
 
 # Ruff
 .ruff_cache/
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials.json
+secrets.toml

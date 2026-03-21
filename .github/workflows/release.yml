@@ -44,11 +44,25 @@ jobs:
       - name: Set up Python
         run: uv python install 3.12
 
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: pip-audit
+        run: |
+          uv pip compile pyproject.toml -q -o /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt
+
       - name: Build package
         run: uv build
 
       - name: Verify package
         run: uvx twine check dist/*
+
+      - name: Check wheel contents
+        run: uvx check-wheel-contents dist/*.whl
+
+      - name: Generate SBOM
+        run: uvx cyclonedx-py --format json -o sbom.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -56,6 +70,7 @@ jobs:
           files: |
             dist/*.whl
             dist/*.tar.gz
+            sbom.json
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
