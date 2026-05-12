@@ -8,6 +8,11 @@ Minimal dependencies (NumPy). Pure Python. 1250+ tests.
 """
 
 from agenticraft_foundation._version import __version__
+from agenticraft_foundation.app_verification import (
+    VerificationCheck,
+    VerificationReport,
+    verify,
+)
 from agenticraft_foundation.algebra import (
     TIMEOUT_EVENT,
     Event,
@@ -65,6 +70,10 @@ from agenticraft_foundation.verification import InvariantRegistry
 
 __all__ = [
     "__version__",
+    # App verification (top-level entry point)
+    "verify",
+    "VerificationReport",
+    "VerificationCheck",
     # CSP Core types
     "Event",
     "ProcessKind",

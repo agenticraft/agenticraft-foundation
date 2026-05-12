@@ -78,6 +78,65 @@ print(f"Traces: {len(t)}")
 
 See the [RAG pipeline verification](examples/rag_pipeline_verification.py) for an end-to-end example combining CSP, deadlock detection, topology analysis, and temporal logic across 4 agents. More examples in the [docs](https://agenticraft.ai/foundation/examples/).
 
+## Verify an AgentiCraft app manifest
+
+The one-call adoption surface. Pass an `app.yaml` dict (or any object exposing `model_dump(by_alias=True)`); get a structured report.
+
+```python
+import yaml
+from agenticraft_foundation import verify
+
+with open("app.yaml") as f:
+    manifest = yaml.safe_load(f)
+
+report = verify(manifest)
+print(report.summary())
+
+if not report.passed:
+    for check in report.errors:
+        print(f"ERROR: {check.name} — {check.message}")
+    raise SystemExit(1)
+```
+
+Five checks run on every manifest:
+
+| Check | Severity | What it catches |
+|---|---|---|
+| `references.integrity` | error | Refs to undefined agents in topology connections / broadcast groups / trust boundaries / workflow steps (including `depends_on`) |
+| `topology.connected` | driven by `coordination_mode` | Disconnected agent graph (Laplacian λ₂); see severity rules below |
+| `topology.fault_tolerant` | warning | Articulation points — single-agent failures that disconnect the graph |
+| `topology.privilege_flow` | error | Connections that cross a trust boundary without declaring `privilege_attenuation` |
+| `workflow.deadlock_free` | error | Per-workflow CSP/LTS deadlock reachability (pipeline / fan-out / DAG / parallel step types) |
+
+**`topology.connected` severity** is driven by `topology.coordination_mode` declared in the manifest:
+
+- `a2a` → disconnected = **error** (real partition bug)
+- `hybrid` → disconnected = **warning** (mixed orchestrator + direct)
+- `orchestrated` (default) → disconnected = **info** (external orchestrator drives each agent independently)
+
+The report passes iff every **error**-severity check passes. Pass `strict=True` to promote warnings to errors for enterprise gating:
+
+```python
+report = verify(manifest, strict=True)  # warnings now block
+```
+
+Serialize the report for CI logs or API responses with `report.to_dict()` — every field, including per-check `duration_ms` and structured `details`, round-trips through JSON.
+
+### CLI
+
+The `[cli]` extra adds PyYAML and a module-level entry point:
+
+```bash
+pip install agenticraft-foundation[cli]
+python -m agenticraft_foundation app.yaml          # human-readable summary
+python -m agenticraft_foundation app.yaml --strict # treat warnings as errors
+python -m agenticraft_foundation app.yaml --json   # machine-readable for CI
+```
+
+Exit codes: `0` (passed), `1` (verification failed), `2` (input error).
+
+The function accepts plain dicts so the foundation has zero dependency on the wider AgentiCraft platform — callers decide whether to parse `app.yaml` via pydantic, raw YAML, or anything else. AgentiCraft's `craft push` invokes `verify()` on every marketplace publish.
+
 ## Architecture
 
 ```mermaid
