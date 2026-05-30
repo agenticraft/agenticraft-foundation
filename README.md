@@ -9,6 +9,7 @@
 <br/>
 
 [![CI](https://img.shields.io/github/actions/workflow/status/agenticraft/agenticraft-foundation/ci.yml?style=flat-square&label=CI)](https://github.com/agenticraft/agenticraft-foundation/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20466793.svg)](https://doi.org/10.5281/zenodo.20466793)
 [![coverage](https://img.shields.io/codecov/c/github/agenticraft/agenticraft-foundation/main?style=flat-square)](https://codecov.io/gh/agenticraft/agenticraft-foundation)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://www.python.org/downloads/)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE)
@@ -330,6 +331,7 @@ See the [full references](https://agenticraft.ai/foundation/changelog/) in the d
   author = {Khateeb, Zaher},
   year = {2026},
   url = {https://github.com/agenticraft/agenticraft-foundation},
+  doi = {10.5281/zenodo.20466793},
   version = {0.1.0},
 }
 ```

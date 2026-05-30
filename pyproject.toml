@@ -49,6 +49,7 @@ Homepage = "https://agenticraft.ai"
 Documentation = "https://agenticraft.github.io/agenticraft-foundation/"
 Repository = "https://github.com/agenticraft/agenticraft-foundation"
 Issues = "https://github.com/agenticraft/agenticraft-foundation/issues"
+DOI = "https://doi.org/10.5281/zenodo.20466793"
 
 [project.optional-dependencies]
 cli = [
