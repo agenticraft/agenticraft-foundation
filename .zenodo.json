@@ -1,0 +1,22 @@
+{
+  "title": "agenticraft-foundation: Formally Verified Foundations for Multi-Agent AI",
+  "description": "Formally verified mathematical foundations for multi-agent AI coordination: CSP / process-algebra operators, multiparty session types (MPST), CTL / temporal-logic model checking, Markov-chain reliability analysis, and spectral topology. Apache-2.0 — the open formal core of the AgentiCraft platform.",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "Apache-2.0",
+  "creators": [
+    { "name": "Khateeb, Zaher", "affiliation": "AgentiCraft" }
+  ],
+  "keywords": [
+    "formal-verification",
+    "process-algebra",
+    "CSP",
+    "multiparty-session-types",
+    "model-checking",
+    "temporal-logic",
+    "markov-chains",
+    "spectral-topology",
+    "multi-agent-systems",
+    "ai-agents"
+  ]
+}
