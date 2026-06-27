@@ -8,11 +8,6 @@ Minimal dependencies (NumPy). Pure Python. 1250+ tests.
 """
 
 from agenticraft_foundation._version import __version__
-from agenticraft_foundation.app_verification import (
-    VerificationCheck,
-    VerificationReport,
-    verify,
-)
 from agenticraft_foundation.algebra import (
     TIMEOUT_EVENT,
     Event,
@@ -40,7 +35,23 @@ from agenticraft_foundation.algebra import (
     trace_equivalent,
     traces,
 )
+from agenticraft_foundation.app_verification import (
+    VerificationCheck,
+    VerificationReport,
+    verify,
+)
 from agenticraft_foundation.mpst import SessionMonitor
+from agenticraft_foundation.resilience import (
+    CLASSICAL_MODEL_VERSION,
+    ClassicalQuorumModel,
+    FaultEstimate,
+    ResilienceModel,
+    ResilienceReport,
+    ResilienceTarget,
+    analyze_topology,
+    graph_from_manifest,
+    load_topology,
+)
 from agenticraft_foundation.serialization import (
     graph_from_dict,
     graph_from_json,
@@ -126,4 +137,14 @@ __all__ = [
     "lts_to_ascii",
     "graph_to_json",
     "graph_from_json",
+    # Resilience diagnostic
+    "analyze_topology",
+    "ResilienceTarget",
+    "ResilienceReport",
+    "ResilienceModel",
+    "ClassicalQuorumModel",
+    "FaultEstimate",
+    "CLASSICAL_MODEL_VERSION",
+    "graph_from_manifest",
+    "load_topology",
 ]

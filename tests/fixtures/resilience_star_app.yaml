@@ -1,0 +1,32 @@
+# Realistic AgentiCraft app-manifest fixture for the resilience loader.
+# Schema mirrors a real apps/*/app.yaml (agents[] + topology.connections with
+# from / to:list / type / coordination_mode). Agent names are anonymized on
+# purpose — do not put internal product codenames in checked-in fixtures.
+#
+# Shape: an orchestrator/star (hub = orchestrator). Exercises the list-valued
+# `to` field and yields a single-point-of-failure topology: f_crash=0, f_byz=0.
+kind: app
+name: resilience-fixture
+version: 0.1.0
+
+agents:
+  - id: orchestrator
+    module: agents.orchestrator.agent
+    capabilities: [planning, delegation]
+  - id: worker_a
+    module: agents.worker_a.agent
+    capabilities: [retrieval]
+  - id: worker_b
+    module: agents.worker_b.agent
+    capabilities: [analysis]
+  - id: worker_c
+    module: agents.worker_c.agent
+    capabilities: [drafting]
+
+topology:
+  coordination_mode: orchestrated
+  connections:
+    - from: orchestrator
+      to: [worker_a, worker_b, worker_c]
+      type: delegate
+      purpose: "Orchestrator delegates subtasks to workers"

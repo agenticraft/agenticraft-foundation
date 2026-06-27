@@ -1,0 +1,30 @@
+# Fully-meshed (a2a) app-manifest fixture for the resilience CLI.
+# Four agents wired complete (every pair connected) => vertex connectivity κ=3,
+# so f_crash=1 and f_byz=1: a Byzantine target of 1 is structurally MET.
+# Anonymized agent names — no internal product codenames in checked-in fixtures.
+kind: app
+name: resilience-mesh-fixture
+version: 0.1.0
+
+agents:
+  - id: node_a
+    module: agents.node_a.agent
+  - id: node_b
+    module: agents.node_b.agent
+  - id: node_c
+    module: agents.node_c.agent
+  - id: node_d
+    module: agents.node_d.agent
+
+topology:
+  coordination_mode: a2a
+  connections:
+    - from: node_a
+      to: [node_b, node_c, node_d]
+      type: delegate
+    - from: node_b
+      to: [node_c, node_d]
+      type: delegate
+    - from: node_c
+      to: [node_d]
+      type: delegate

@@ -89,8 +89,10 @@ class FaultToleranceAnalysis:
     """Analysis of fault tolerance capabilities.
 
     Attributes:
-        crash_tolerance: Maximum crash failures tolerable (f < n/2)
-        byzantine_tolerance: Maximum Byzantine failures (f < n/3)
+        crash_tolerance: Max crash-stop faults tolerable — ``min(κ - 1, (n-1)//2)``.
+        byzantine_tolerance: Max Byzantine faults — ``min((κ - 1)//2, (n-1)//3)``.
+            This is *structural capacity*, not a realized-BFT guarantee: it also
+            requires a running voting/agreement mechanism over the replicas.
         critical_nodes: Nodes whose failure most impacts connectivity
         redundancy_score: Score indicating redundancy level (0-1)
         suggested_redundancy: Suggested edges to improve fault tolerance
@@ -125,6 +127,43 @@ class FaultToleranceAnalysis:
                 lines.append(f"  - {src} -- {tgt}")
 
         return "\n".join(lines)
+
+
+def classical_fault_tolerance(n_agents: int, vertex_connectivity: int) -> tuple[int, int]:
+    """Maximum (crash-stop, Byzantine) faults from the classical agreement bounds.
+
+    Single source of truth for the classical fault-tolerance bounds, shared by
+    :meth:`ConnectivityAnalyzer.analyze_fault_tolerance` and the resilience
+    diagnostic so the two never diverge.
+
+    With ``n`` agents and vertex connectivity ``κ`` (over the undirected graph):
+
+    * Crash-stop — stay connected (``κ > f``) and keep a quorum (``n >= 2f+1``)::
+
+          f_crash = min(κ - 1, (n - 1) // 2)
+
+    * Byzantine — needs ``(2f+1)``-connectivity (``κ >= 2f+1``) and a
+      super-majority quorum (``n >= 3f+1``)::
+
+          f_byz = min((κ - 1) // 2, (n - 1) // 3)
+
+    The Byzantine figure is *structural capacity*: necessary but not sufficient —
+    realized tolerance also requires a running voting/agreement mechanism over
+    the redundant agents. ``κ`` is undirected, so ``f_byz`` cannot see directed
+    source-multiplicity; treat it as a coarse structural proxy.
+
+    Args:
+        n_agents: Number of agents (graph nodes).
+        vertex_connectivity: ``κ`` — minimum nodes to remove to disconnect.
+
+    Returns:
+        ``(f_crash, f_byz)`` — both clamped at 0.
+    """
+    if n_agents <= 1 or vertex_connectivity <= 0:
+        return (0, 0)
+    f_crash = max(0, min(vertex_connectivity - 1, (n_agents - 1) // 2))
+    f_byz = max(0, min((vertex_connectivity - 1) // 2, (n_agents - 1) // 3))
+    return (f_crash, f_byz)
 
 
 class ConnectivityAnalyzer:
@@ -208,11 +247,12 @@ class ConnectivityAnalyzer:
         seen_edges: set[tuple[str, str]] = set()
 
         for edge in self._graph.get_edges():
-            # Normalize edge direction
-            edge_key = tuple(sorted([edge.source, edge.target]))
+            # Normalize edge direction to a canonical (low, high) pair.
+            low, high = sorted([edge.source, edge.target])
+            edge_key = (low, high)
             if edge_key in seen_edges:
                 continue
-            seen_edges.add(edge_key)  # type: ignore[arg-type]
+            seen_edges.add(edge_key)
 
             # Temporarily remove edge and check connectivity
             original_neighbors_src = self._adjacency[edge.source].copy()
@@ -267,8 +307,11 @@ class ConnectivityAnalyzer:
         complete graphs and many regular graphs.
 
         Returns:
-            Minimum vertex degree (upper bound on edge connectivity).
+            Minimum vertex degree (upper bound on edge connectivity), or 0
+            for an empty graph.
         """
+        if not self._adjacency:
+            return 0
         min_degree = min(len(neighbors) for neighbors in self._adjacency.values())
         return min_degree
 
@@ -354,13 +397,13 @@ class ConnectivityAnalyzer:
         n = len(self._node_ids)
         connectivity = self.analyze()
 
-        # Crash fault tolerance: can tolerate f crashes if n >= 2f + 1
-        # So f < n/2, but also limited by connectivity
-        crash_tolerance = min(connectivity.vertex_connectivity, (n - 1) // 2)
-
-        # Byzantine fault tolerance: requires n >= 3f + 1
-        # So f < n/3, but also limited by connectivity
-        byzantine_tolerance = min(connectivity.vertex_connectivity, (n - 1) // 3)
+        # Classical bounds via the shared source of truth: crash-stop needs the
+        # graph to stay connected (κ > f) and a quorum (n >= 2f+1); Byzantine
+        # needs (2f+1)-connectivity and n >= 3f+1. byzantine_tolerance is
+        # structural capacity, not a realized-BFT guarantee.
+        crash_tolerance, byzantine_tolerance = classical_fault_tolerance(
+            n, connectivity.vertex_connectivity
+        )
 
         # Find critical nodes (articulation points + high-degree nodes)
         critical_nodes = list(connectivity.articulation_points)
@@ -455,5 +498,6 @@ __all__ = [
     "ConnectivityAnalysis",
     "FaultToleranceAnalysis",
     "ConnectivityAnalyzer",
+    "classical_fault_tolerance",
     "verify_consensus_requirements",
 ]

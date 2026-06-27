@@ -16,6 +16,7 @@ from agenticraft_foundation.topology.connectivity import (
     ConnectivityAnalysis,
     ConnectivityAnalyzer,
     FaultToleranceAnalysis,
+    classical_fault_tolerance,
     verify_consensus_requirements,
 )
 
@@ -50,6 +51,7 @@ __all__ = [
     "ConnectivityAnalysis",
     "ConnectivityAnalyzer",
     "FaultToleranceAnalysis",
+    "classical_fault_tolerance",
     "verify_consensus_requirements",
     # Hypergraph
     "Hyperedge",
