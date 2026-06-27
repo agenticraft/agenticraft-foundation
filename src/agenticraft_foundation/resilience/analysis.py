@@ -80,6 +80,7 @@ def analyze_topology(
         byz_cost_multiplier=byz_cost,
         min_agents_for_target=min_agents,
         remediations=remediations,
+        cascade_grade=estimate.cascade_grade,
     )
 
 

@@ -61,6 +61,7 @@ class ResilienceReport:
     min_agents_for_target: int | None = None
     remediations: list[str] = field(default_factory=list)
     byz_semantics: str = "capacity"
+    cascade_grade: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Render the report as a JSON-serializable dict."""
@@ -76,6 +77,7 @@ class ResilienceReport:
             "byz_semantics": self.byz_semantics,
             "byz_caveat": BYZ_CAVEAT,
             "byz_basis": "undirected-projection",
+            "cascade_grade": self.cascade_grade,
             "crash_binding": self.crash_binding,
             "byz_binding": self.byz_binding,
             "articulation_points": list(self.articulation_points),
@@ -93,7 +95,7 @@ class ResilienceReport:
 
     def to_text(self) -> str:
         """Render a human-readable report, leading with the two numbers."""
-        prov = " — PROVISIONAL placeholder" if self.provisional else ""
+        prov = " — PROVISIONAL" if self.provisional else ""
         lines = [
             f"Resilience diagnostic (model: {self.model_version}{prov})",
             "=" * 72,
@@ -107,6 +109,8 @@ class ResilienceReport:
             f"      [{BYZ_CAVEAT}]",
             f"      binding: {self.byz_binding}",
         ]
+        if self.cascade_grade:
+            lines.insert(6, f"      cascade grade: {self.cascade_grade}")
 
         if self.target is not None:
             status = "MET" if self.meets_target else "NOT MET"
@@ -144,7 +148,8 @@ class ResilienceReport:
         ]
         if self.provisional:
             lines.append(
-                "This is the classical placeholder, NOT the validated RD-28 empirical model."
+                f"Provisional model ({self.model_version}); no validated Byzantine "
+                "empirical result exists yet — f_byz stays a classical-bounds figure."
             )
         return "\n".join(lines)
 

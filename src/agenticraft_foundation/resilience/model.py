@@ -47,6 +47,9 @@ class FaultEstimate:
             (``edge_count / (n*(n-1)/2)``), in ``[0, 1]`` — a "how meshed" signal.
         articulation_points: Agents whose removal disconnects the mesh.
         suggested_edges: Redundancy edges that would raise connectivity.
+        cascade_grade: Optional empirically-grounded crash-stop cascade-risk
+            band, set by the RD-28 EmpiricalMeshModel (None for the classical
+            model). An annotation only — it never changes the integer bounds.
     """
 
     f_crash: int
@@ -59,6 +62,7 @@ class FaultEstimate:
     redundancy_score: float
     articulation_points: list[str] = field(default_factory=list)
     suggested_edges: list[tuple[str, str]] = field(default_factory=list)
+    cascade_grade: str | None = None
 
 
 @runtime_checkable

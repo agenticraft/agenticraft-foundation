@@ -136,6 +136,12 @@ class TestReportShape:
         sparse = analyze_topology(NetworkGraph.create_star(6))
         assert 0.0 < sparse.redundancy_score < 1.0
 
+    def test_classical_model_leaves_cascade_grade_none(self) -> None:
+        # cascade_grade is the empirical model's contribution; classical = None.
+        report = analyze_topology(NetworkGraph.create_complete(4))
+        assert report.cascade_grade is None
+        assert report.to_dict()["cascade_grade"] is None
+
     def test_to_text_leads_with_numbers_and_caveats(self) -> None:
         text = analyze_topology(NetworkGraph.create_star(6)).to_text()
         assert "f_crash" in text and "f_byz" in text
