@@ -27,7 +27,7 @@ class ProtocolName(str, Enum):
     Protocols:
         MCP: Model Context Protocol (Anthropic) - Agent-to-Tool communication
         A2A: Agent-to-Agent Protocol (Google) - Agent-to-Agent communication
-        ANP: Agent Network Protocol (W3C) - Decentralized P2P networks
+        AGENT_FEDERATION: Agent federation (W3C) - Decentralized P2P networks
         CUSTOM: Custom protocol adapters for extension
     """
 
@@ -37,7 +37,7 @@ class ProtocolName(str, Enum):
     A2A = "a2a"
     """Agent-to-Agent Protocol - Agent coordination and task delegation."""
 
-    ANP = "anp"
+    AGENT_FEDERATION = "agent_federation"
     """Agent Network Protocol - Decentralized peer-to-peer mesh."""
 
     CUSTOM = "custom"

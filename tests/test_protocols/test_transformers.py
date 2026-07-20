@@ -71,20 +71,20 @@ class TestIdentityTransformer:
 class TestComposedTransformer:
     def test_composition_works(self):
         t1 = SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A)
-        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.ANP)
+        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.AGENT_FEDERATION)
         composed = ComposedTransformer(t1, t2)
         assert composed.source_protocol == ProtocolName.MCP
-        assert composed.target_protocol == ProtocolName.ANP
+        assert composed.target_protocol == ProtocolName.AGENT_FEDERATION
 
     def test_composition_type_mismatch_raises(self):
         t1 = SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A)
-        t2 = SimpleTransformer(ProtocolName.ANP, ProtocolName.CUSTOM)
+        t2 = SimpleTransformer(ProtocolName.AGENT_FEDERATION, ProtocolName.CUSTOM)
         with pytest.raises(ValueError, match="Cannot compose"):
             ComposedTransformer(t1, t2)
 
     def test_composition_executes(self):
         t1 = SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A)
-        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.ANP)
+        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.AGENT_FEDERATION)
         composed = ComposedTransformer(t1, t2)
         result = composed.transform({"key": "value"})
         assert result.success
@@ -92,7 +92,7 @@ class TestComposedTransformer:
 
     def test_lossless_composition_stays_lossless(self):
         t1 = SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A)
-        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.ANP)
+        t2 = SimpleTransformer(ProtocolName.A2A, ProtocolName.AGENT_FEDERATION)
         composed = ComposedTransformer(t1, t2)
         assert composed.classification == TransformerClassification.LOSSLESS
 
@@ -113,8 +113,8 @@ class TestTransformerRegistry:
     def test_auto_composition(self):
         registry = TransformerRegistry()
         registry.register(SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A))
-        registry.register(SimpleTransformer(ProtocolName.A2A, ProtocolName.ANP))
-        composed = registry.get_transformer(ProtocolName.MCP, ProtocolName.ANP)
+        registry.register(SimpleTransformer(ProtocolName.A2A, ProtocolName.AGENT_FEDERATION))
+        composed = registry.get_transformer(ProtocolName.MCP, ProtocolName.AGENT_FEDERATION)
         assert composed is not None
         result = composed.transform({"test": 1})
         assert result.success
@@ -132,11 +132,11 @@ class TestTransformerRegistry:
     def test_get_all_paths(self):
         registry = TransformerRegistry()
         registry.register(SimpleTransformer(ProtocolName.MCP, ProtocolName.A2A))
-        registry.register(SimpleTransformer(ProtocolName.A2A, ProtocolName.ANP))
-        paths = registry.get_all_paths(ProtocolName.MCP, ProtocolName.ANP)
+        registry.register(SimpleTransformer(ProtocolName.A2A, ProtocolName.AGENT_FEDERATION))
+        paths = registry.get_all_paths(ProtocolName.MCP, ProtocolName.AGENT_FEDERATION)
         assert len(paths) >= 1
         assert paths[0][0] == ProtocolName.MCP
-        assert paths[0][-1] == ProtocolName.ANP
+        assert paths[0][-1] == ProtocolName.AGENT_FEDERATION
 
     def test_statistics(self):
         registry = TransformerRegistry()

@@ -88,12 +88,12 @@ def diamond_graph() -> ProtocolGraph:
     g = ProtocolGraph()
     g.add_agent("a1", ["code_execution"], {ProtocolName.MCP})
     g.add_agent("a2", ["task_delegation"], {ProtocolName.MCP, ProtocolName.A2A})
-    g.add_agent("a3", ["resource_access"], {ProtocolName.MCP, ProtocolName.ANP})
-    g.add_agent("a4", ["agent_discovery"], {ProtocolName.A2A, ProtocolName.ANP})
+    g.add_agent("a3", ["resource_access"], {ProtocolName.MCP, ProtocolName.AGENT_FEDERATION})
+    g.add_agent("a4", ["agent_discovery"], {ProtocolName.A2A, ProtocolName.AGENT_FEDERATION})
     g.add_edge("a1", "a2", {ProtocolName.MCP}, weights={ProtocolName.MCP: 1.0})
     g.add_edge("a1", "a3", {ProtocolName.MCP}, weights={ProtocolName.MCP: 2.0})
     g.add_edge("a2", "a4", {ProtocolName.A2A}, weights={ProtocolName.A2A: 1.0})
-    g.add_edge("a3", "a4", {ProtocolName.ANP}, weights={ProtocolName.ANP: 1.0})
+    g.add_edge("a3", "a4", {ProtocolName.AGENT_FEDERATION}, weights={ProtocolName.AGENT_FEDERATION: 1.0})
     return g
 
 
@@ -159,7 +159,7 @@ class TestAgentNode:
         )
         assert node.supports_protocol(ProtocolName.MCP)
         assert node.supports_protocol(ProtocolName.A2A)
-        assert not node.supports_protocol(ProtocolName.ANP)
+        assert not node.supports_protocol(ProtocolName.AGENT_FEDERATION)
 
     def test_hash_by_agent_id(self):
         n1 = AgentNode(agent_id="abc")
@@ -202,7 +202,7 @@ class TestProtocolEdge:
             protocols={ProtocolName.MCP, ProtocolName.A2A},
         )
         assert edge.supports_protocol(ProtocolName.MCP)
-        assert not edge.supports_protocol(ProtocolName.ANP)
+        assert not edge.supports_protocol(ProtocolName.AGENT_FEDERATION)
 
     def test_hash(self):
         e1 = ProtocolEdge(source="a", target="b", protocols={ProtocolName.MCP})
@@ -1601,7 +1601,7 @@ class TestTranslationBoundProperty:
             total_cost=2.0,
             translation_points=[
                 ("a1", ProtocolName.MCP, ProtocolName.A2A),
-                ("a2", ProtocolName.A2A, ProtocolName.ANP),
+                ("a2", ProtocolName.A2A, ProtocolName.AGENT_FEDERATION),
             ],
             semantic_loss_estimate=0.0,
         )

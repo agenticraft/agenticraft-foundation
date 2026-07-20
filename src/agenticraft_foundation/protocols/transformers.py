@@ -17,8 +17,8 @@ Usage::
     registry.register(mcp_to_a2a)
     registry.register(a2a_to_mcp)
 
-    # Auto-compose: MCP → A2A → ANP
-    composed = registry.get_transformer(ProtocolName.MCP, ProtocolName.ANP)
+    # Auto-compose: MCP → A2A → AGENT_FEDERATION
+    composed = registry.get_transformer(ProtocolName.MCP, ProtocolName.AGENT_FEDERATION)
     result = composed.transform(message)
 """
 
@@ -256,8 +256,8 @@ class TransformerRegistry:
         # Direct lookup
         t = registry.get_transformer(ProtocolName.MCP, ProtocolName.A2A)
 
-        # Auto-composed (MCP→A2A→ANP)
-        t = registry.get_transformer(ProtocolName.MCP, ProtocolName.ANP)
+        # Auto-composed (MCP→A2A→AGENT_FEDERATION)
+        t = registry.get_transformer(ProtocolName.MCP, ProtocolName.AGENT_FEDERATION)
     """
 
     def __init__(self) -> None:
