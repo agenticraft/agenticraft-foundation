@@ -261,7 +261,13 @@ def _coerce_to_dict(manifest: Any) -> dict[str, Any]:
         return manifest
     dump = getattr(manifest, "model_dump", None)
     if callable(dump):
-        return dump(by_alias=True)
+        dumped = dump(by_alias=True)
+        if not isinstance(dumped, dict):
+            raise TypeError(
+                "model_dump(by_alias=True) returned "
+                f"{type(dumped).__name__}, expected a dict"
+            )
+        return dumped
     raise TypeError(
         "verify() expects a dict or an object with .model_dump(by_alias=True); "
         f"got {type(manifest).__name__}"

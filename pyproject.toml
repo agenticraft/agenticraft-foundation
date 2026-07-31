@@ -60,6 +60,7 @@ dev = [
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.0",
     "mypy>=1.0",
+    "types-PyYAML>=6.0",
     "ruff>=0.4",
     "pyyaml>=6.0",
 ]
@@ -77,6 +78,7 @@ dev = [
     "pytest-benchmark>=4.0",
     "hypothesis>=6.0",
     "mypy>=1.0",
+    "types-PyYAML>=6.0",
     "ruff>=0.4",
     "pre-commit>=3.0",
 ]
@@ -111,7 +113,7 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B"]
-ignore = ["UP038"]
+ignore = []
 
 [tool.coverage.run]
 source = ["agenticraft_foundation"]

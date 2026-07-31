@@ -93,7 +93,12 @@ def diamond_graph() -> ProtocolGraph:
     g.add_edge("a1", "a2", {ProtocolName.MCP}, weights={ProtocolName.MCP: 1.0})
     g.add_edge("a1", "a3", {ProtocolName.MCP}, weights={ProtocolName.MCP: 2.0})
     g.add_edge("a2", "a4", {ProtocolName.A2A}, weights={ProtocolName.A2A: 1.0})
-    g.add_edge("a3", "a4", {ProtocolName.AGENT_FEDERATION}, weights={ProtocolName.AGENT_FEDERATION: 1.0})
+    g.add_edge(
+        "a3",
+        "a4",
+        {ProtocolName.AGENT_FEDERATION},
+        weights={ProtocolName.AGENT_FEDERATION: 1.0},
+    )
     return g
 
 

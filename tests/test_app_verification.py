@@ -15,7 +15,6 @@ import pytest
 
 from agenticraft_foundation import VerificationCheck, VerificationReport, verify
 
-
 # =============================================================================
 # Manifest fixtures
 # =============================================================================
