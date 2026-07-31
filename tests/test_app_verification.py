@@ -195,6 +195,23 @@ class TestInputCoercion:
         report = verify(FakeModel())
         assert isinstance(report, VerificationReport)
 
+    def test_rejects_model_dump_returning_non_dict(self) -> None:
+        """A model_dump that answers with the wrong shape must raise, not flow.
+
+        ``model_dump`` is caller code; its result is what every verification
+        check then reads. Passing a non-dict through would fail later inside
+        an arbitrary check with an error naming the check instead of the
+        manifest — the shape violation is the manifest's, so it is reported
+        at the boundary.
+        """
+
+        class WrongShape:
+            def model_dump(self, by_alias: bool = False) -> Any:
+                return ["not", "a", "mapping"]
+
+        with pytest.raises(TypeError, match="expected a dict"):
+            verify(WrongShape())
+
     def test_rejects_non_dict_non_pydantic(self) -> None:
         with pytest.raises(TypeError, match="dict or an object"):
             verify("not a manifest")  # type: ignore[arg-type]
