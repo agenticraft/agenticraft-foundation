@@ -61,8 +61,19 @@ jobs:
       - name: Check wheel contents
         run: uvx check-wheel-contents dist/*.whl
 
+      # ``cyclonedx-py`` dropped the bare ``--format`` interface; the current
+      # CLI takes a SOURCE subcommand. ``environment`` documents a Python
+      # environment — so the wheel is installed into a throwaway venv first
+      # and the SBOM is generated against THAT interpreter. Running it against
+      # uvx's own ephemeral venv would produce a syntactically valid SBOM
+      # describing the SBOM tool instead of the release, which is worse than
+      # the loud failure the old flags now produce.
       - name: Generate SBOM
-        run: uvx cyclonedx-py --format json -o sbom.json
+        run: |
+          uv venv sbom-env
+          uv pip install --python sbom-env/bin/python dist/*.whl
+          uvx --from cyclonedx-bom cyclonedx-py environment \
+            sbom-env/bin/python --of JSON -o sbom.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
