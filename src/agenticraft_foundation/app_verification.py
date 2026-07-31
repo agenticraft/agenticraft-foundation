@@ -228,9 +228,7 @@ def verify(manifest: Any, *, strict: bool = False) -> VerificationReport:
     checks.extend(_timed(_check_workflow_deadlock_freedom, manifest_dict))
 
     has_blocking_failure = any(
-        (not c.passed) and (
-            c.severity == "error" or (strict and c.severity == "warning")
-        )
+        (not c.passed) and (c.severity == "error" or (strict and c.severity == "warning"))
         for c in checks
     )
     duration_ms = (time.perf_counter() - start) * 1000.0
@@ -264,8 +262,7 @@ def _coerce_to_dict(manifest: Any) -> dict[str, Any]:
         dumped = dump(by_alias=True)
         if not isinstance(dumped, dict):
             raise TypeError(
-                "model_dump(by_alias=True) returned "
-                f"{type(dumped).__name__}, expected a dict"
+                f"model_dump(by_alias=True) returned {type(dumped).__name__}, expected a dict"
             )
         return dumped
     raise TypeError(
@@ -296,16 +293,10 @@ def _connection_to(conn: dict[str, Any]) -> list[str]:
 
 def _defined_agent_ids(manifest: dict[str, Any]) -> set[str]:
     """Set of agent IDs declared in ``manifest.agents``."""
-    return {
-        a["id"]
-        for a in manifest.get("agents") or []
-        if isinstance(a, dict) and a.get("id")
-    }
+    return {a["id"] for a in manifest.get("agents") or [] if isinstance(a, dict) and a.get("id")}
 
 
-def _timed(
-    check_fn: Any, manifest: dict[str, Any]
-) -> list[VerificationCheck]:
+def _timed(check_fn: Any, manifest: dict[str, Any]) -> list[VerificationCheck]:
     """Time a check function and stamp ``duration_ms`` on each result.
 
     Each check returns a list of :class:`VerificationCheck` (some checks
@@ -350,14 +341,11 @@ def _check_reference_integrity(
     for idx, conn in enumerate(topology.get("connections") or []):
         src = _connection_from(conn)
         if src and src not in defined_ids:
-            violations.append(
-                f"topology.connections[{idx}].from='{src}' is not a defined agent"
-            )
+            violations.append(f"topology.connections[{idx}].from='{src}' is not a defined agent")
         for tgt in _connection_to(conn):
             if tgt not in defined_ids:
                 violations.append(
-                    f"topology.connections[{idx}].to includes '{tgt}' which is "
-                    "not a defined agent"
+                    f"topology.connections[{idx}].to includes '{tgt}' which is not a defined agent"
                 )
 
     for group in topology.get("groups") or []:
@@ -481,10 +469,7 @@ def _check_topology_connectivity(
                 name="topology.connected",
                 passed=True,
                 severity="info",
-                message=(
-                    f"Single-agent app ({len(agent_ids)} agent); "
-                    "connectivity check trivial."
-                ),
+                message=(f"Single-agent app ({len(agent_ids)} agent); connectivity check trivial."),
                 details={"agent_count": len(agent_ids), "coordination_mode": mode},
             )
         ]
@@ -510,7 +495,8 @@ def _check_topology_connectivity(
             edge_count += 1
 
     orphan_agents = [
-        aid for aid in agent_ids
+        aid
+        for aid in agent_ids
         if not any(
             _connection_from(c) == aid or aid in _connection_to(c)
             for c in (topology.get("connections") or [])
@@ -907,9 +893,7 @@ def _workflow_to_process(wf: dict[str, Any]) -> Process:
 
     has_explicit_deps = any((s.get("depends_on") or []) for s in steps)
     if has_explicit_deps:
-        nodes: dict[str, WorkflowNodeType] = {
-            sid: WorkflowNodeType.TASK for sid in step_ids
-        }
+        nodes: dict[str, WorkflowNodeType] = {sid: WorkflowNodeType.TASK for sid in step_ids}
         edges: list[tuple[str, str]] = []
         for step in steps:
             for dep in step.get("depends_on") or []:
@@ -944,8 +928,7 @@ def _step_to_process(step: dict[str, Any]) -> Process:
     if step.get("type") == "parallel" and parallel_targets:
         sync_set = frozenset({TICK})
         events = [
-            prefix(f"{sid}.{_parallel_target_id(entry)}", skip())
-            for entry in parallel_targets
+            prefix(f"{sid}.{_parallel_target_id(entry)}", skip()) for entry in parallel_targets
         ]
         composite: Process = events[0]
         for event_process in events[1:]:

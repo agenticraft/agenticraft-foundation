@@ -89,8 +89,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not isinstance(data, dict):
         print(
-            f"Top-level of {args.manifest} must be a mapping; "
-            f"got {type(data).__name__}.",
+            f"Top-level of {args.manifest} must be a mapping; got {type(data).__name__}.",
             file=sys.stderr,
         )
         return 2
