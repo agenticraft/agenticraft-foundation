@@ -14,7 +14,7 @@ This abstraction enables protocol-aware routing, automatic protocol translation,
 
 - $E$: **Edges**. Each edge $(u, v) \in E$ represents a communication link between agents $u$ and $v$, with an associated weight $w(u, v) \in \mathbb{R}^+$ representing latency or cost.
 
-- $P$: **Protocol universe**. The set of all protocols in the mesh, e.g., $P = \{\text{MCP}, \text{A2A}, \text{ANP}, \ldots\}$.
+- $P$: **Protocol universe**. The set of all protocols in the mesh, e.g., $P = \{\text{MCP}, \text{A2A}, \text{Agent Federation}, \ldots\}$.
 
 - $\Phi$: **Protocol assignment**. A function $\Phi : E \to 2^P$ mapping each edge to the set of protocols available on that link.
 
@@ -26,7 +26,7 @@ This abstraction enables protocol-aware routing, automatic protocol translation,
 |------|-------------|-------------------|
 | `LLM_AGENT` | Language model agent with reasoning capabilities | MCP, A2A |
 | `TOOL_SERVER` | Stateless tool execution endpoint | MCP |
-| `COORDINATOR` | Orchestration node managing multi-agent workflows | A2A, ANP |
+| `COORDINATOR` | Orchestration node managing multi-agent workflows | A2A, Agent Federation |
 | `GATEWAY` | Protocol translation bridge between network segments | All protocols |
 
 ## Routing Algorithms
