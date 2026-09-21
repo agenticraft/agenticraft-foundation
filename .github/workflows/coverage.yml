@@ -128,19 +128,21 @@ jobs:
 
       - name: Generate per-module summary
         run: |
-          echo "## Per-Module Coverage" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Module | Coverage |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|--------|----------|" >> "$GITHUB_STEP_SUMMARY"
-          for module in algebra mpst protocols topology verification specifications complexity integration; do
-            FILE="coverage-${module}.json"
-            if [ -f "$FILE" ]; then
-              PCT=$(python3 -c "import json; d=json.load(open('$FILE')); print(f\"{d.get('totals', {}).get('percent_covered', 0):.1f}%\")")
-              echo "| ${module} | ${PCT} |" >> "$GITHUB_STEP_SUMMARY"
-            else
-              echo "| ${module} | — |" >> "$GITHUB_STEP_SUMMARY"
-            fi
-          done
+          {
+            echo "## Per-Module Coverage"
+            echo ""
+            echo "| Module | Coverage |"
+            echo "|--------|----------|"
+            for module in algebra mpst protocols topology verification specifications complexity integration; do
+              FILE="coverage-${module}.json"
+              if [ -f "$FILE" ]; then
+                PCT=$(python3 -c "import json; d=json.load(open('$FILE')); print(f\"{d.get('totals', {}).get('percent_covered', 0):.1f}%\")")
+                echo "| ${module} | ${PCT} |"
+              else
+                echo "| ${module} | — |"
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload per-module reports
         uses: actions/upload-artifact@v4
