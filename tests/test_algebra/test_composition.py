@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Composition tests: new operators work with existing operators and analysis."""
 
 from __future__ import annotations

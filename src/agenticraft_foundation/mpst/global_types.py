@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Global session types for multi-party choreographies.
 
 Global types describe the overall communication structure from a

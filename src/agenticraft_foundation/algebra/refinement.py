@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Refinement checking for CSP processes.
 
 This module provides:

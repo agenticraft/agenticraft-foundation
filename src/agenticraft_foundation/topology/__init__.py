@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Network topology analysis for distributed systems.
 
 This module provides graph-theoretic tools for analyzing and optimizing

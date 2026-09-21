@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Protocol graph model: G = (V, E, P, Φ, Γ).
 
 Formal graph-theoretic representation of multi-protocol mesh topology.

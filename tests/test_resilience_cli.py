@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CLI tests for ``python -m agenticraft_foundation.resilience``.
 
 Verifies the CI-gating exit codes (0 met / 1 unmet / 2 input error) and the

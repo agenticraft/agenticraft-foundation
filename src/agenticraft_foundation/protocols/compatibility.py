@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Protocol compatibility relation.
 
 Defines full, partial, or incompatible translation between protocols

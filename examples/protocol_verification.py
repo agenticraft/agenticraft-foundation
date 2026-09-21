@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Protocol Verification -- Multiparty Session Types.
 
 Demonstrates SessionMonitor and SessionTypeChecker for protocol conformance.

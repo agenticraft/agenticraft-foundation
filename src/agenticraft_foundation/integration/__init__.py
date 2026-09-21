@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal verification integration adapters.
 
 This module provides integration adapters that connect formal verification

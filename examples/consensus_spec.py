@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal Consensus Specification -- CSP model of distributed consensus.
 
 Demonstrates using CSP operators to model and verify consensus properties.

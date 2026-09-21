@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Extended CSP operators for agent coordination.
 

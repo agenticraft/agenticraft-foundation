@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Engine tests for the resilience diagnostic.
 
 Covers the canonical topologies (star, chain, ring, voting ensemble), degenerate

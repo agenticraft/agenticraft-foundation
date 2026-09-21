@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Semantic Protocol-Aware Routing (Algorithm 4).
 
 Routes messages based on semantic similarity of capabilities,

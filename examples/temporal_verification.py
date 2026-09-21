@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CTL Temporal Logic Verification -- model checking over LTS.
 
 Demonstrates CTL formula construction and backward fixpoint model checking

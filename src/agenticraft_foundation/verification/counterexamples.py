@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Structured counterexample generation for refinement and equivalence failures.
 
 This module provides:

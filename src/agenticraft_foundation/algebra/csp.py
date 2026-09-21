@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CSP (Communicating Sequential Processes) implementation.
 
 Based on Hoare (1985) - Communicating Sequential Processes.

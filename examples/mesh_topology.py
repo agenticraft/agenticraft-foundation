@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Spectral Topology Analysis -- Network resilience via Laplacian.
 
 Demonstrates LaplacianAnalysis for evaluating agent mesh topologies.

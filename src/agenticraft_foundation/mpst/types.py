@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Core type definitions for Multiparty Session Types (MPST).
 
 This module provides the foundational types for MPST-based verification

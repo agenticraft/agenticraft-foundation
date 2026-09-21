@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal protocol model for multi-protocol mesh.
 
 Implements the formal model with the following components:

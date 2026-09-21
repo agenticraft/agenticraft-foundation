@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal properties for Multiparty Session Types.
 
 This module provides executable formal properties for verifying

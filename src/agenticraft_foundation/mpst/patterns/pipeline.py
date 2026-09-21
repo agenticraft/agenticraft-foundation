@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Pipeline pattern for sequential multi-stage processing.
 
 A message flows through a sequence of processing stages,

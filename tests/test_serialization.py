@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Round-trip serialization tests for CSP processes, LTS, and protocol graphs."""
 
 from __future__ import annotations

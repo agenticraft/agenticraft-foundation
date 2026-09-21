@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Path cost function: cost(π, σ).
 
 Computes cost(π, σ) = Σ wₑ(p) + Σ τ(pᵢ, pᵢ₊₁, vᵢ)

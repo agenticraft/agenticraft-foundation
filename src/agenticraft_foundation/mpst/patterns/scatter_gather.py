@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Scatter-Gather pattern for coordinator-worker communication.
 
 A coordinator sends tasks to multiple workers and gathers their responses.

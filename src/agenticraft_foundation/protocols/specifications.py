@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal protocol specifications for verifying routing correctness.
 
 Provides executable formal specifications following the pattern from

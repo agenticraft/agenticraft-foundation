@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Swappable fault-tolerance models for the resilience diagnostic.
 
 A :class:`ResilienceModel` maps an agent topology (a

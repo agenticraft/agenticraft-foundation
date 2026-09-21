@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Process equivalence checking for CSP.
 
 This module provides:

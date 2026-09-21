@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Complexity bounds and theoretical limits.
 
 This module provides utilities for reasoning about complexity bounds,

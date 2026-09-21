@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Interrupt, Timeout, Guard -- Agent-specific CSP extensions.
 
 Demonstrates the 5 new operators for real agent coordination scenarios.

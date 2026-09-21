@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Load an agent topology from an AgentiCraft application manifest.
 
 The multi-agent topology lives in a manifest's ``topology.connections`` — the

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Tests for topology analysis module."""
 
 from agenticraft_foundation.topology import (

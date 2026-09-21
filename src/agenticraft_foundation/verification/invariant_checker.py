@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Runtime invariant checking for distributed systems.
 
 This module provides tools for runtime verification of distributed system

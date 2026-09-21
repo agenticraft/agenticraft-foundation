@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CSP Process Algebra integration for workflow orchestration.
 
 This module provides workflow verification using CSP refinement checking.

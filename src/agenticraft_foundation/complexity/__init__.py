@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Complexity annotations and bounds for distributed algorithms.
 
 This module provides tools for documenting and analyzing algorithm complexity,

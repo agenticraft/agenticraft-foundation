@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Protocol-aware Dijkstra routing (Algorithm 1).
 
 Finds optimal path considering protocol translation costs.

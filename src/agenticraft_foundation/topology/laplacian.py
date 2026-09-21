@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Graph Laplacian analysis for network topology optimization.
 
 This module provides spectral analysis tools for understanding and optimizing

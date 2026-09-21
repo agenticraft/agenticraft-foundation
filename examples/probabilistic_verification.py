@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Probabilistic Verification -- DTMC model checking for stochastic agents.
 
 Demonstrates DTMC construction, reachability probability computation,

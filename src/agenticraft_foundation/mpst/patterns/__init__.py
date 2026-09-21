@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Common multi-agent session patterns.
 
 This module provides reusable session type patterns for common

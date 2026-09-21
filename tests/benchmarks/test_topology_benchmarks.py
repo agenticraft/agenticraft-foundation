@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Scalability benchmarks for topology analysis.
 
 Validates that numpy-backed spectral analysis scales to real-world

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Contract tests for :func:`agenticraft_foundation.verify`.
 
 These tests lock the verification report shape and the severity

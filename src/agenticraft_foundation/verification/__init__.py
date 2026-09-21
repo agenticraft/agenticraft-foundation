@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Verification tools for distributed systems.
 
 This module provides:

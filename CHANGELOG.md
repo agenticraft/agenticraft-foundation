@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `SPDX-License-Identifier: Apache-2.0` as the first comment line of every
+  Python file under `src/`, `tests/`, `examples/` and `scripts/`, so tooling
+  that reads one file -- SBOM generators, vendoring tools -- sees the license
+  the packaging metadata declares. No behaviour changes.
+
 ## [0.1.0] - 2026-02-28
 
 Initial release of the formally verified mathematical foundations for multi-agent AI coordination.

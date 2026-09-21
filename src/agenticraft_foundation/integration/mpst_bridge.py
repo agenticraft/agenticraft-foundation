@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """MPST integration adapter for protocol bridges.
 
 This module provides session type verification for cross-protocol messaging.

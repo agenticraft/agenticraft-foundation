@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Local session types and projection algorithm.
 
 Local types describe the communication behavior from a single

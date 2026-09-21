@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Property-based tests for CSP algebraic laws using Hypothesis.
 
 Generates random process trees and checks that fundamental algebraic

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Multiparty Session Types (MPST) for formal protocol verification.
 
 This module provides a comprehensive framework for specifying and

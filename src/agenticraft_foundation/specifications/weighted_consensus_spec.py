@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Weighted Byzantine Fault Tolerance specifications.
 
 Extends consensus specifications with quality-weighted quorum consensus.

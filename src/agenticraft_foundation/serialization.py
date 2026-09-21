@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Serialization for CSP processes, LTS, and protocol graphs.
 
 Round-trip guarantee: ``from_dict(to_dict(x)) == x`` for all supported types.

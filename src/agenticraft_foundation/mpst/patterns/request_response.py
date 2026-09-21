@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Request-Response pattern for client-server communication.
 
 The simplest multi-party session pattern where a client sends a

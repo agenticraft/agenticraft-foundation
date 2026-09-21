@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Hypergraph extension for multi-agent group coordination.
 
 Extends the graph model with hyperedges that connect >2 agents,

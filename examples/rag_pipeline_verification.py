@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """RAG Pipeline Verification -- End-to-end formal verification of a multi-agent system.
 
 A 4-agent Retrieval-Augmented Generation pipeline:

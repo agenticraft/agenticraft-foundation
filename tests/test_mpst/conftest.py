@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Test fixtures for MPST tests."""
 
 from __future__ import annotations

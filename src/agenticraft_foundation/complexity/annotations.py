@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Complexity annotations for algorithm documentation and analysis.
 
 This module provides decorators and utilities for documenting and analyzing

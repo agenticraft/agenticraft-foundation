@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Capability-protocol affinity matrix: α(c, p) → [0, 1].
 
 Maps capabilities to optimal protocols based on protocol characteristics.

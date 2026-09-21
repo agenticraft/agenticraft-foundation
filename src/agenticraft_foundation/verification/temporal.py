@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CTL (Computation Tree Logic) temporal model checking.
 
 This module provides:

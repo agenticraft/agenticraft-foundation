@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Composable Protocol Transformers.
 
 Models protocol transformers as composable algebraic objects:

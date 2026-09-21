@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """CSP Composition -- Core 8 operators working together.
 
 Demonstrates: Stop, Skip, Prefix, ExternalChoice, InternalChoice,

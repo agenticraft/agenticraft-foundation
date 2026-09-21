@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Tests for complexity annotations system."""
 
 from agenticraft_foundation.complexity import (

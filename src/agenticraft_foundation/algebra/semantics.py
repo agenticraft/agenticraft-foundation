@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Labeled Transition System (LTS) for CSP operational semantics.
 
 This module provides:

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Top-level verification entry point for AgentiCraft application manifests.
 
 This module provides :func:`verify` -- the one-call adoption surface for

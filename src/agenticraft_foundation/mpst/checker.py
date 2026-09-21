@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Session type checker with runtime verification.
 
 This module provides type checking for MPST sessions, integrating with

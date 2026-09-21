@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Consensus pattern for multi-party agreement protocols.
 
 Two-Phase Commit (2PC) protocol where a coordinator collects

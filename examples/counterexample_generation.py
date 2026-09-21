@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Counterexample Generation -- structured failure explanations.
 
 Demonstrates how to get detailed, human-readable explanations when

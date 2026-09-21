@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Network connectivity analysis for distributed systems.
 
 This module provides tools for analyzing and verifying network connectivity

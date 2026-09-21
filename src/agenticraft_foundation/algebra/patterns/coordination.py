@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Coordination patterns for multi-agent systems.
 
 These patterns express common coordination scenarios in CSP,

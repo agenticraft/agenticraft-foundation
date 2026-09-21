@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Protocol Workflow Model: W = (T, ≺, ρ).
 
 Formal model for protocol-aware workflow composition.

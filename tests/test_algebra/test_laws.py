@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Algebraic law tests for CSP operator correctness."""
 
 from __future__ import annotations

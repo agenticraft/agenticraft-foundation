@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Classical Multi-Agent Systems (MAS) formal mappings.
 
 Maps classical MAS theories to mesh coordination primitives:

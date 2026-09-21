@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Static resilience diagnostic for multi-agent topologies.
 
 Point it at an agent topology (a

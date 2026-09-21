@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Process Algebra module for formal verification of agent coordination.
 
 This module provides:

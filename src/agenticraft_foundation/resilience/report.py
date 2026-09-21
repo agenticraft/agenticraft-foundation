@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Output contract for the resilience diagnostic.
 
 :class:`ResilienceTarget` is the desired tolerance to check against;

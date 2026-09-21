@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Semantic preservation verification.
 
 Verifies Definition 9 (Semantic Preservation): meaning(m) = meaning(T_{p→p'}(m)).

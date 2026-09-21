@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Probabilistic verification for Discrete-Time Markov Chains (DTMC).
 
 This module provides:

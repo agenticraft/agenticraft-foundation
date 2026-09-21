@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Tests for the 5 extended CSP operators."""
 
 from __future__ import annotations

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Formal specifications for consensus protocols.
 
 This module provides executable formal specifications for verifying
