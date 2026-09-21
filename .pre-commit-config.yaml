@@ -25,3 +25,16 @@ repos:
     rev: v8.21.2
     hooks:
       - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: check-spdx-headers
+        name: SPDX license headers
+        entry: python3 scripts/check_spdx_headers.py
+        language: system
+        # The gate judges .py files and refuses a run it was handed none of,
+        # so the hook selects on that suffix. The `python` tag alone is wider
+        # than the gate: pre-commit reads it from the file, and an
+        # extensionless script with a python shebang carries it.
+        types: [python]
+        files: '\.py$'

@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Python file under `src/`, `tests/`, `examples/` and `scripts/`, so tooling
   that reads one file -- SBOM generators, vendoring tools -- sees the license
   the packaging metadata declares. No behaviour changes.
+- `scripts/check_spdx_headers.py`, a self-testing gate that fails on a Python
+  file with no identifier, an identifier that is not the first comment line,
+  one naming another license, or bytes it cannot read as UTF-8. It reads the
+  expected identifier from the `[project]` table, so the headers and the
+  declared license cannot drift apart. Given no paths it walks the tree,
+  pruning a directory on what it is rather than on what it is called: a tool's
+  own cache wherever it sits, a virtual environment by its `pyvenv.cfg`, a
+  dependency tree by the manifest beside it, build output only at the root. A
+  package or fixture named `venv`, `node_modules` or `build` is judged as the
+  source it is, and a run that judged no file reports that it took no
+  measurement rather than certifying a tree it never read.
+  Runs in the `lint` job of CI, over the staged files at commit time from
+  `.pre-commit-config.yaml`, and stands in the pre-PR checklist. The `typecheck`
+  job and the lint job now cover `scripts/`, so the gate is held to the same
+  strict rules as the library.
 
 ## [0.1.0] - 2026-02-28
 

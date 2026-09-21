@@ -15,6 +15,7 @@ uv run pytest tests/ -v
 - **Type checker**: mypy in strict mode
 - **Docstrings**: Google style
 - **Imports**: Always use `from __future__ import annotations` at the top of every module
+- **License header**: Every `.py` file starts with `# SPDX-License-Identifier: Apache-2.0`
 
 Standard import order:
 
@@ -27,6 +28,27 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from some_module import SomeType
 ```
+
+## License Headers
+
+Every Python file in the repository -- `src/`, `tests/`, `examples/` and
+`scripts/` alike -- carries the project's SPDX identifier as its first comment
+line, below a shebang when the file has one:
+
+```python
+# SPDX-License-Identifier: Apache-2.0
+```
+
+The identifier is the license `pyproject.toml` declares, so an SBOM generator,
+a vendoring tool or a reviewer reading one module sees the license from the
+file itself rather than from package metadata alone. Stamp a new file with:
+
+```bash
+python3 scripts/check_spdx_headers.py --fix
+```
+
+CI fails on a Python file that carries no header, one whose identifier sits
+below the docstring, or one naming another license. See `scripts/README.md`.
 
 ## Testing
 
@@ -56,13 +78,16 @@ uv run pytest tests/benchmarks/ -v --benchmark
 
 ```bash
 # Check for lint errors
-uv run ruff check src/ tests/
+uv run ruff check src/ tests/ scripts/
 
 # Auto-format
-uv run ruff format src/ tests/
+uv run ruff format src/ tests/ scripts/
+
+# License headers
+python3 scripts/check_spdx_headers.py
 
 # Type check
-uv run mypy src/
+uv run mypy src/ scripts/
 ```
 
 ## Pre-Commit Hooks
@@ -101,9 +126,10 @@ chore(ci): update GitHub Actions workflow
 Before submitting a PR:
 
 - [ ] All tests pass (`uv run pytest tests/ -v`)
-- [ ] Linter is clean (`uv run ruff check src/ tests/`)
-- [ ] Code is formatted (`uv run ruff format --check src/ tests/`)
-- [ ] Type checker passes (`uv run mypy src/`)
+- [ ] Linter is clean (`uv run ruff check src/ tests/ scripts/`)
+- [ ] Code is formatted (`uv run ruff format --check src/ tests/ scripts/`)
+- [ ] Every Python file carries its license header (`python3 scripts/check_spdx_headers.py`)
+- [ ] Type checker passes (`uv run mypy src/ scripts/`)
 - [ ] New functionality has tests
 - [ ] Docstrings follow Google style
 

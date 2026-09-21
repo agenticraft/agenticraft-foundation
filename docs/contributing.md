@@ -15,6 +15,7 @@ uv run pytest tests/ -v
 - **Type checker:** mypy in strict mode
 - **Docstrings:** Google style
 - **Imports:** Always use `from __future__ import annotations` at the top of every module
+- **License header:** Every `.py` file starts with `# SPDX-License-Identifier: Apache-2.0`
 
 Standard import order:
 
@@ -27,6 +28,20 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from some_module import SomeType
 ```
+
+## License Headers
+
+Every Python file carries the project's SPDX identifier as its first comment
+line, below a shebang when the file has one:
+
+```python
+# SPDX-License-Identifier: Apache-2.0
+```
+
+The identifier is the license `pyproject.toml` declares, so tooling that reads
+a single file -- an SBOM generator, a vendoring tool -- sees the license
+without consulting package metadata. Stamp a new file with
+`python3 scripts/check_spdx_headers.py --fix`; CI fails on a file without it.
 
 ## Testing
 
@@ -57,13 +72,16 @@ uv run pytest tests/test_algebra.py -v
 
 ```bash
 # Check for lint errors
-uv run ruff check src/ tests/
+uv run ruff check src/ tests/ scripts/
 
 # Auto-format
-uv run ruff format src/ tests/
+uv run ruff format src/ tests/ scripts/
 
 # Type check
-uv run mypy src/
+uv run mypy src/ scripts/
+
+# License headers
+python3 scripts/check_spdx_headers.py
 ```
 
 ## PR Process
