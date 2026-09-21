@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
 """
 agenticraft-foundation -- Formally verified mathematical foundations
 for multi-agent AI coordination.
